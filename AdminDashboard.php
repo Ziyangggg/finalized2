@@ -242,5 +242,4 @@ sqlsrv_close($connect);
 
 </body>
 </html>
-
 <script src="script.js"></script>
