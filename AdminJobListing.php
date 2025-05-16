@@ -1,11 +1,19 @@
 <?php include("admin_session.php"); ?>
 <?php
-require_once('connect.php');
-$id=$_SESSION["adminid"];
-$query = "SELECT * FROM admin_info WHERE AdminID = '$id'";
-$result = mysqli_query($connect,$query);
-$row49 = mysqli_fetch_assoc($result);
+require_once('connect.php'); // Make sure this uses sqlsrv_connect()
 
+$id = $_SESSION["adminid"];
+
+$sql = "SELECT * FROM finalyearproject.admin_info WHERE AdminID = ?";
+$params = array($id);
+
+$stmt = sqlsrv_query($connect, $sql, $params);
+
+if ($stmt === false) {
+    die(print_r(sqlsrv_errors(), true));
+}
+
+$row49 = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -146,22 +154,37 @@ $row49 = mysqli_fetch_assoc($result);
                 
             <tr>
                           <?php
-                          $username=$_SESSION["adminusername"];//nshow admin name
-                          $sql = "select * from joblisting where is_deleted = '0' order by JobListingID DESC";
-                          $result = mysqli_query($connect,$sql);
-                          while($row = mysqli_fetch_assoc($result))
-                          {
-                            $jid = $row['JobListingID'];
-                            $new = $row['CompanyID']; 
-                            $sql2 = "select * from company_info WHERE CompanyID = '$new'and is_deleted = '0'";
-                            $result2 = mysqli_query($connect,$sql2);
-                            $row2 = mysqli_fetch_assoc($result2);
-                            if(is_array($row2)){
-                              $categoryid=$row['JobCategoryID'];
-                              $sql4 = "select * from jobcategory  where JobCategoryID= $categoryid and is_deleted = '0'";
-                              $result4 = mysqli_query($connect,$sql4);
-                              $row3 = mysqli_fetch_assoc($result4);
-                              if(is_array($row3)){
+                            $username = $_SESSION["adminusername"]; // show admin name
+
+                            // Query all job listings not marked as deleted
+                            $sql = "SELECT * FROM finalyearproject.joblisting WHERE is_deleted = '0' ORDER BY JobListingID DESC";
+                            $stmt = sqlsrv_query($connect, $sql);
+
+                            if ($stmt === false) {
+                                die(print_r(sqlsrv_errors(), true));
+                            }
+
+                            while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+                                $jid = $row['JobListingID'];
+                                $new = $row['CompanyID'];
+
+                                // Query company info
+                                $sql2 = "SELECT * FROM finalyearproject.company_info WHERE CompanyID = ? AND is_deleted = '0'";
+                                $params2 = array($new);
+                                $stmt2 = sqlsrv_query($connect, $sql2, $params2);
+                                $row2 = sqlsrv_fetch_array($stmt2, SQLSRV_FETCH_ASSOC);
+
+                                if (is_array($row2)) {
+                                    $categoryid = $row['JobCategoryID'];
+
+                                    // Query job category
+                                    $sql4 = "SELECT * FROM finalyearproject.jobcategory WHERE JobCategoryID = ? AND is_deleted = '0'";
+                                    $params4 = array($categoryid);
+                                    $stmt4 = sqlsrv_query($connect, $sql4, $params4);
+                                    $row3 = sqlsrv_fetch_array($stmt4, SQLSRV_FETCH_ASSOC);
+
+                                    if (is_array($row3)) {
+                                        // Your HTML or PHP output logic here
                           ?>
                           <td><?php echo $row['JobListingID']; ?></td>
                           <td><?php echo $row['JobTitle']; ?></td>
@@ -251,18 +274,24 @@ function confirmation()
 </script>
 
 <?php
+require_once('connect.php'); // Ensure this includes your SQLSRV connection
 
-	if(isset($_GET['dlt']))
-	{
-		$jid=$_GET['jid'];
-		$query = "UPDATE joblisting SET is_deleted = '1' WHERE JobListingID = $jid";
-		$result = mysqli_query($connect,$query);
-?>
-            <script type='text/javascript'>
+if (isset($_GET['dlt'])) {
+    $jid = $_GET['jid'];
 
-                window.location.href="AdminJobListing.php";
-            </script>
+    $query = "UPDATE finalyearproject.joblisting SET is_deleted = '1' WHERE JobListingID = ?";
+    $params = array($jid);
 
-<?php
-  }
+    $stmt = sqlsrv_query($connect, $query, $params);
+
+    if ($stmt === false) {
+        die(print_r(sqlsrv_errors(), true));
+    } else {
+        ?>
+        <script type='text/javascript'>
+            window.location.href = "AdminJobListing.php";
+        </script>
+        <?php
+    }
+}
 ?>
