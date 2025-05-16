@@ -1,15 +1,27 @@
-<?php include("admin_session.php"); ?>
-<?php
-
+<?php 
+include("admin_session.php");
 require_once('connect.php');
-$id=$_SESSION["adminid"];
-$query = "SELECT * FROM admin_info WHERE AdminID = '$id'";
-$result = mysqli_query($connect,$query);
-$row49 = mysqli_fetch_assoc($result);
 
-$query = "select * from jobcategory where is_deleted='0' order by JobCategoryID DESC";
-$result = mysqli_query($connect,$query);
+$id = $_SESSION["adminid"];
 
+// Query admin info using prepared statement
+$query = "SELECT * FROM finalyearproject.admin_info WHERE AdminID = ?";
+$params = array($id);
+$result = sqlsrv_query($connect, $query, $params);
+
+if ($result === false) {
+    die(print_r(sqlsrv_errors(), true));
+}
+
+$row49 = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC);
+
+// Query jobcategory info (not deleted)
+$query2 = "SELECT * FROM finalyearproject.jobcategory WHERE is_deleted = '0' ORDER BY JobCategoryID DESC";
+$result2 = sqlsrv_query($connect, $query2);
+
+if ($result2 === false) {
+    die(print_r(sqlsrv_errors(), true));
+}
 ?>
 
 <!DOCTYPE html>
@@ -155,20 +167,22 @@ $result = mysqli_query($connect,$query);
                     <tbody>
                         <tr>
                           <?php
-                          $username=$_SESSION["adminusername"];//nshow admin name
-                          while($row = mysqli_fetch_assoc($result))
-                          {
-                           $ctid=$row['JobCategoryID'];
+                          $username = $_SESSION["adminusername"]; // show admin name
+
+                          while ($row = sqlsrv_fetch_array($result2, SQLSRV_FETCH_ASSOC)) {
+                              $ctid = $row['JobCategoryID'];
                           ?>
-                          <td><?php echo $row['JobCategoryID']; ?></td>
-                          <td><?php echo $row['JobCategoryName']; ?></td>
-                          <td>
-                            <a class="btn btn-danger" href="AdminCategory.php?dlt&ctid=<?php echo $ctid ?>" onclick="return confirmation();">Delete</a>
-                          </td>
-                        </tr>
-                        <?php
-                          }
-                        ?>
+                          <tr>
+                              <td><?php echo $row['JobCategoryID']; ?></td>
+                              <td><?php echo $row['JobCategoryName']; ?></td>
+                              <td>
+                                  <a class="btn btn-danger" href="AdminCategory.php?dlt&ctid=<?php echo $ctid ?>" onclick="return confirmation();">Delete</a>
+                              </td>
+                          </tr>
+                          <?php
+                            }
+                          ?>
+
 </tbody>
 </table>
 </div> 
@@ -191,18 +205,26 @@ function confirmation()
 
 
 <?php
+if (isset($_GET['dlt'])) {
+    $ctid = $_GET['ctid'];
 
-	if(isset($_GET['dlt']))
-	{
-		$ctid=$_GET['ctid'];
-		$query = "UPDATE jobcategory SET is_deleted = '1' WHERE JobCategoryID = $ctid ";
-		$result = mysqli_query($connect,$query);
+    // Prepare the update query with a parameter placeholder
+    $query = "UPDATE finalyearproject.jobcategory SET is_deleted = '1' WHERE JobCategoryID = ?";
+    
+    // Prepare parameters array
+    $params = array($ctid);
+
+    // Execute the query using sqlsrv_query
+    $result = sqlsrv_query($connect, $query, $params);
+
+    if ($result === false) {
+        // Handle errors if needed
+        die(print_r(sqlsrv_errors(), true));
+    }
 ?>
-            <script type='text/javascript'>
-
-                window.location.href="AdminCategory.php";
-            </script>
-
+    <script type='text/javascript'>
+        window.location.href = "AdminCategory.php";
+    </script>
 <?php
-  }
+}
 ?>
