@@ -1,11 +1,26 @@
-<?php include("admin_session.php"); 
+<?php 
+include("admin_session.php"); 
 require_once('connect.php');
-$username=$_SESSION["adminusername"];//nshow admin name
-                  $id=$_SESSION["adminid"];
-                  $sql = "select * from admin_info WHERE AdminID = '$id' ";
-                  $result = mysqli_query($connect,$sql); 
-                  $row = mysqli_fetch_assoc($result);?>
 
+$username = $_SESSION["adminusername"];
+$id = $_SESSION["adminid"];
+
+// Use parameterized query to avoid SQL injection
+$sql = "SELECT * FROM finalyearproject.admin_info WHERE AdminID = ?";
+$params = array($id);
+
+// Query the database using SQLSRV
+$stmt = sqlsrv_query($connect, $sql, $params);
+
+if ($stmt === false) {
+    die(print_r(sqlsrv_errors(), true));
+}
+
+$row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+
+// Free the statement when done
+sqlsrv_free_stmt($stmt);
+?>
 
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
@@ -220,34 +235,34 @@ $username=$_SESSION["adminusername"];//nshow admin name
 
 <script src="script.js"></script>
 <?php
-if(isset($_POST["submit"]))
-	{
-		$name = $_POST["fullname"];
-		$username = $_POST["username"];
+if (isset($_POST["submit"])) {
+    $name = $_POST["fullname"];
+    $username = $_POST["username"];
     $address = $_POST["address"];
-		$password = $_POST["password"];
+    $password = $_POST["password"];
     $phone = $_POST["phonenumber"];
     $email = $_POST["emailaddress"];
 
-    
-    
-    
-        $query = "UPDATE admin_info SET AdminFullName='$name',AdminPassword='$password',AdminUsername='$username'
-        ,AdminEmail='$email',AdminPhone='$phone',AdminAddress='$address'
-        WHERE AdminID='$adminid'";
-        $result = mysqli_query($connect,$query);
+    // Make sure $adminid is set, e.g., from session
+    $adminid = $_SESSION['adminid']; 
 
-  
-    
-    
-	?>
-	
-	<script>
-		alert("Update Company Profile Done!");
-    window.location.href="AdminProfile.php";
-    
-	</script>
-	
-	<?php
-	}
-  ?>
+    $sql = "UPDATE finalyearproject.admin_info 
+            SET AdminFullName = ?, AdminPassword = ?, AdminUsername = ?, AdminEmail = ?, AdminPhone = ?, AdminAddress = ? 
+            WHERE AdminID = ?";
+
+    $params = array($name, $password, $username, $email, $phone, $address, $adminid);
+
+    $stmt = sqlsrv_query($connect, $sql, $params);
+
+    if ($stmt === false) {
+        die(print_r(sqlsrv_errors(), true));
+    } else {
+        // Update successful, show alert and redirect
+        echo '<script>
+                alert("Update Admin Profile Done!");
+                window.location.href="AdminProfile.php";
+              </script>';
+        exit(); // stop further execution after redirect
+    }
+}
+?>
