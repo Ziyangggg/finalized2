@@ -1,8 +1,25 @@
-<?php include("admin_session.php"); 
-$id=$_SESSION["adminid"];
-$query = "SELECT * FROM admin_info WHERE AdminID = '$id'";
-$result = mysqli_query($connect,$query);
-$row49 = mysqli_fetch_assoc($result);?>
+<?php 
+include("admin_session.php"); 
+
+$id = $_SESSION["adminid"];
+
+// Prepare query with parameter placeholder
+$query = "SELECT * FROM finalyearproject.admin_info WHERE AdminID = ?";
+
+// Prepare parameters array
+$params = array($id);
+
+// Execute query using sqlsrv_query
+$result = sqlsrv_query($connect, $query, $params);
+
+if ($result === false) {
+    die(print_r(sqlsrv_errors(), true));
+}
+
+// Fetch result as associative array
+$row49 = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC);
+?>
+
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
   <head>
@@ -169,21 +186,29 @@ $row49 = mysqli_fetch_assoc($result);?>
 <script src="script.js"></script>
 
 <?php
-$username=$_SESSION["adminusername"];//nshow admin name
-	include("connect.php");
-	
-	if(isset($_POST["submit"]))
-	{
-		$category = $_POST["category"];
+$username = $_SESSION["adminusername"]; // show admin name
+include("connect.php");
 
-		$query = "INSERT INTO jobcategory(JobCategoryName,is_deleted)
-		VALUES('$category','0')";
-		$result = mysqli_query($connect,$query);
-		
+if (isset($_POST["submit"])) {
+    $category = $_POST["category"];
 
-	mysqli_close($connect);
-	
-	?>
+    // Prepare the SQL statement with a parameter placeholder
+    $query = "INSERT INTO finalyearproject.jobcategory (JobCategoryName, is_deleted) VALUES (?, 0)";
+
+    // Prepare parameters array
+    $params = array($category);
+
+    // Execute the query
+    $result = sqlsrv_query($connect, $query, $params);
+
+    if ($result === false) {
+        die(print_r(sqlsrv_errors(), true));
+    }
+
+    // Close the connection
+    sqlsrv_close($connect);
+?>
+
 	
 	<script>
 		alert("Add New Category Done!");
@@ -192,3 +217,4 @@ $username=$_SESSION["adminusername"];//nshow admin name
 	
 	<?php
 	}
+  ?>
