@@ -1,12 +1,20 @@
-<?php include("admin_session.php"); ?>
 <?php
-require_once('connect.php');
-$id=$_SESSION["adminid"];
-$query = "SELECT * FROM admin_info WHERE AdminID = '$id'";
-$result = mysqli_query($connect,$query);
-$row49 = mysqli_fetch_assoc($result);
+include("admin_session.php");
+require_once('connect.php'); // your connection file should use sqlsrv_connect
 
+$id = $_SESSION["adminid"];
+
+$sql = "SELECT * FROM finalyearproject.admin_info WHERE AdminID = ?";
+$params = array($id);
+
+$stmt = sqlsrv_query($connect, $sql, $params);
+if ($stmt === false) {
+    die(print_r(sqlsrv_errors(), true)); // error handling
+}
+
+$row49 = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
@@ -143,23 +151,34 @@ $row49 = mysqli_fetch_assoc($result);
             <tbody>
             <tr>
                           <?php
-                          $username=$_SESSION["adminusername"];//nshow admin name
-                          $sql = "select * from feedback order by FeedbackID DESC";
-                          $result = mysqli_query($connect,$sql);
-                          while($row = mysqli_fetch_assoc($result))
-                          {
-                            $new = $row['CompanyID']; 
-                            $sql2 = "select * from company_info WHERE CompanyID = '$new' and is_deleted='0'";
-                            $result2 = mysqli_query($connect,$sql2);
-                            $row2 = mysqli_fetch_assoc($result2);
-                            if(is_array($row2)){
+                            $username = $_SESSION["adminusername"]; // show admin name
 
-                            $new2 = $row['Job_SeekerID']; 
-                            $sql3 = "select Job_SeekerUsername from job_seekerinfo WHERE Job_SeekerID = '$new2' and is_deleted='0'";
-                            $result3 = mysqli_query($connect,$sql3);
-                            $row3 = mysqli_fetch_assoc($result3);
-                            if(is_array($row3)){
-                          ?>
+                            $sql = "SELECT * FROM finalyearproject.feedback ORDER BY FeedbackID DESC";
+                            $result = sqlsrv_query($connect, $sql);
+                            if ($result === false) {
+                                die(print_r(sqlsrv_errors(), true));
+                            }
+
+                            while ($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)) {
+                                $new = $row['CompanyID'];
+                                $sql2 = "SELECT * FROM finalyearproject.company_info WHERE CompanyID = ? AND is_deleted = '0'";
+                                $params2 = array($new);
+                                $result2 = sqlsrv_query($connect, $sql2, $params2);
+                                if ($result2 === false) {
+                                    die(print_r(sqlsrv_errors(), true));
+                                }
+                                $row2 = sqlsrv_fetch_array($result2, SQLSRV_FETCH_ASSOC);
+                                if (is_array($row2)) {
+                                    $new2 = $row['Job_SeekerID'];
+                                    $sql3 = "SELECT Job_SeekerUsername FROM finalyearproject.job_seekerinfo WHERE Job_SeekerID = ? AND is_deleted = '0'";
+                                    $params3 = array($new2);
+                                    $result3 = sqlsrv_query($connect, $sql3, $params3);
+                                    if ($result3 === false) {
+                                        die(print_r(sqlsrv_errors(), true));
+                                    }
+                                    $row3 = sqlsrv_fetch_array($result3, SQLSRV_FETCH_ASSOC);
+                                    if (is_array($row3)) {
+                                        ?>
                           <td><?php echo $row['FeedBackID']; ?></td>
                           <td><?php echo $row2['CompanyName']; ?></td>
                           <td><?php echo $row['CompanyID']; ?></td>
