@@ -4,6 +4,8 @@ require_once('connect.php');
 $query=mysqli_query($connect,"SELECT * FROM job_seekerinfo where Job_SeekerID='$jobseekerid' ")or die(mysqli_error());
 $row38=mysqli_fetch_array($query);
 
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
