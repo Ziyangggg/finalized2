@@ -1,14 +1,23 @@
-<?php include("admin_session.php"); 
-$id=$_SESSION["adminid"];
-$query = "SELECT * FROM admin_info WHERE AdminID = '$id'";
-$result = mysqli_query($connect,$query);
-$row = mysqli_fetch_assoc($result);
+<?php 
+include("admin_session.php"); 
 
+$id = $_SESSION["adminid"];
 
+$sql = "SELECT * FROM finalyearproject.admin_info WHERE AdminID = ?";
+$params = array($id);
 
+$stmt = sqlsrv_query($connect, $sql, $params);
 
+if ($stmt === false) {
+    die(print_r(sqlsrv_errors(), true));
+}
 
+$row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+
+sqlsrv_free_stmt($stmt);
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
   <head>
@@ -223,31 +232,36 @@ $row = mysqli_fetch_assoc($result);
 <script src="script.js"></script>
 
 <?php
-  $username=$_SESSION["adminusername"];//nshow admin name
-	include("connect.php");
-	
-	if(isset($_POST["submit"]))
-	{
-		$name = $_POST["fullname"];
-		$username = $_POST["username"];
-		$password = $_POST["password"];
-		$emailaddress = $_POST["emailaddress"];
+  $username = $_SESSION["adminusername"]; // show admin name
+  include("connect.php");
+
+  if (isset($_POST["submit"])) {
+    $name = $_POST["fullname"];
+    $username = $_POST["username"];
+    $password = $_POST["password"];
+    $emailaddress = $_POST["emailaddress"];
     $phonenumber = $_POST["phonenumber"];
     $address = $_POST["address"];
-		
-		$query = "INSERT INTO admin_info(AdminFullName,AdminUsername,AdminPassword,AdminEmail,AdminPhone,AdminAddress)
-		VALUES('$name','$username','$password','$emailaddress','$phonenumber','$address')";
-		$result = mysqli_query($connect,$query);
-		
 
-	mysqli_close($connect);
-	
-	?>
-	
-	<script>
-		alert("Add Admin Done!");
-    window.location.href="AdminAddAdmin.php";
-	</script>
-	
-	<?php
-	}
+    $sql = "INSERT INTO finalyearproject.admin_info 
+            (AdminFullName, AdminUsername, AdminPassword, AdminEmail, AdminPhone, AdminAddress)
+            VALUES (?, ?, ?, ?, ?, ?)";
+
+    $params = array($name, $username, $password, $emailaddress, $phonenumber, $address);
+
+    $stmt = sqlsrv_query($connect, $sql, $params);
+
+    if ($stmt === false) {
+        die(print_r(sqlsrv_errors(), true));
+    }
+
+    sqlsrv_free_stmt($stmt);
+    sqlsrv_close($connect);
+?>
+    <script>
+        alert("Add Admin Done!");
+        window.location.href = "AdminAddAdmin.php";
+    </script>
+<?php
+  }
+?>
