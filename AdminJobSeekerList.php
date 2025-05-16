@@ -1,16 +1,29 @@
-<?php include("admin_session.php"); ?>
-<?php
-
+<?php 
+include("admin_session.php");
 require_once('connect.php');
-$id=$_SESSION["adminid"];
-$query = "SELECT * FROM admin_info WHERE AdminID = '$id'";
-$result = mysqli_query($connect,$query);
-$row49 = mysqli_fetch_assoc($result);
 
-$query = "select * from job_seekerinfo where is_deleted='0' order by Job_SeekerID DESC";
-$result = mysqli_query($connect,$query);
+$id = $_SESSION["adminid"];
 
+// Query 1: Select admin info with parameterized query
+$query = "SELECT * FROM finalyearproject.admin_info WHERE AdminID = ?";
+$params = array($id);
+
+$result = sqlsrv_query($connect, $query, $params);
+if ($result === false) {
+    die(print_r(sqlsrv_errors(), true));
+}
+
+$row49 = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC);
+
+// Query 2: Select job seekers where is_deleted = 0, ordered by Job_SeekerID DESC
+$query2 = "SELECT * FROM finalyearproject.job_seekerinfo WHERE is_deleted = 0 ORDER BY Job_SeekerID DESC";
+
+$result2 = sqlsrv_query($connect, $query2);
+if ($result2 === false) {
+    die(print_r(sqlsrv_errors(), true));
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
   <head>
@@ -147,17 +160,29 @@ $result = mysqli_query($connect,$query);
             </thead>
             <tbody>
             <?php
-                          $username=$_SESSION["adminusername"];//nshow admin name
-                          while($row = mysqli_fetch_assoc($result))
-                          {
-                            $jsid=$row['Job_SeekerID']; 
-                            $sql4 = "select * from resume_jobseeker WHERE Job_SeekerID = '$jsid'";
-                            $result4 = mysqli_query($connect,$sql4);
-                            $row4 = mysqli_fetch_assoc($result4);
-                            if(is_array($row4)){
-                              
-                                    
-                          ?>
+              $username = $_SESSION["adminusername"]; // show admin name
+
+              while ($row = sqlsrv_fetch_array($result2, SQLSRV_FETCH_ASSOC)) {
+                  $jsid = $row['Job_SeekerID'];
+
+                  // Prepare query with parameter placeholder
+                  $sql4 = "SELECT * FROM finalyearproject.resume_jobseeker WHERE Job_SeekerID = ?";
+                  $params4 = array($jsid);
+
+                  // Execute query
+                  $result4 = sqlsrv_query($connect, $sql4, $params4);
+
+                  if ($result4 === false) {
+                      die(print_r(sqlsrv_errors(), true));
+                  }
+
+                  // Fetch result as associative array
+                  $row4 = sqlsrv_fetch_array($result4, SQLSRV_FETCH_ASSOC);
+
+                  if (is_array($row4)) {
+                      // Your code here...
+              ?>
+
             <tr>
                           
                           <td><?php echo $row['Job_SeekerID']; ?></td>
@@ -247,18 +272,23 @@ function confirmation()
 }
 </script>
 <?php
+if (isset($_GET['dlt'])) {
+    $jsid = $_GET['jsid'];
 
-	if(isset($_GET['dlt']))
-	{
-		$jsid=$_GET['jsid'];
-		$query = "UPDATE job_seekerinfo SET is_deleted = '1' WHERE Job_SeekerID = $jsid ";
-		$result = mysqli_query($connect,$query);
-?>
-            <script type='text/javascript'>
+    // Use parameterized query to avoid SQL injection
+    $query = "UPDATE finalyearproject.job_seekerinfo SET is_deleted = '1' WHERE Job_SeekerID = ?";
+    $params = array($jsid);
 
-                window.location.href="AdminJobSeekerList.php";
-            </script>
+    $result = sqlsrv_query($connect, $query, $params);
 
-<?php
-  }
+    if ($result === false) {
+        die(print_r(sqlsrv_errors(), true));
+    } else {
+        ?>
+        <script type="text/javascript">
+            window.location.href = "AdminJobSeekerList.php";
+        </script>
+        <?php
+    }
+}
 ?>
