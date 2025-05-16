@@ -2,15 +2,30 @@
 <?php
 
 require_once('connect.php');
-$id=$_SESSION["adminid"];
-$query = "SELECT * FROM admin_info WHERE AdminID = '$id'";
-$result = mysqli_query($connect,$query);
-$row49 = mysqli_fetch_assoc($result);
 
-$query = "select * from message";
-$result = mysqli_query($connect,$query);
+// Get admin ID from session
+$id = $_SESSION["adminid"];
 
+// Prepare the first query (get admin info)
+$query1 = "SELECT * FROM finalyearproject.admin_info WHERE AdminID = ?";
+$params1 = array($id);
+$stmt1 = sqlsrv_query($connect, $query1, $params1);
+
+if ($stmt1 === false) {
+    die(print_r(sqlsrv_errors(), true));
+}
+
+$row49 = sqlsrv_fetch_array($stmt1, SQLSRV_FETCH_ASSOC);
+
+// Prepare the second query (get all messages)
+$query2 = "SELECT * FROM finalyearproject.message";
+$stmt2 = sqlsrv_query($connect, $query2);
+
+if ($stmt2 === false) {
+    die(print_r(sqlsrv_errors(), true));
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
   <head>
@@ -141,19 +156,20 @@ $result = mysqli_query($connect,$query);
           </thead>
           <tbody>
           <tr>
-                          <?php
-                          $username=$_SESSION["adminusername"];//nshow admin name
-                          while($row = mysqli_fetch_assoc($result))
-                          {
-                          ?>
-                          <td><?php echo $row['Job_SeekerID']; ?></td>
-                          <td><?php echo $row['Name']; ?></td>
-                          <td><?php echo $row['Email']; ?></td>
-                          <td><?php echo $row['Message']; ?></td>
-                        </tr>
-                        <?php
-                          }
-                        ?>
+          <?php
+          $username = $_SESSION["adminusername"]; // show admin name
+
+          while ($row = sqlsrv_fetch_array($stmt2, SQLSRV_FETCH_ASSOC)) {
+          ?>
+            <tr>
+                <td><?php echo $row['Job_SeekerID']; ?></td>
+                <td><?php echo $row['Name']; ?></td>
+                <td><?php echo $row['Email']; ?></td>
+                <td><?php echo $row['Message']; ?></td>
+            </tr>
+          <?php
+            }
+          ?>
 
           </tbody>
         </table>
