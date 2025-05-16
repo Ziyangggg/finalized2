@@ -1,11 +1,21 @@
 <?php include("admin_session.php"); ?>
 <?php
-require_once('connect.php');
-$id=$_SESSION["adminid"];
-$query = "SELECT * FROM admin_info WHERE AdminID = '$id'";
-$result = mysqli_query($connect,$query);
-$row49 = mysqli_fetch_assoc($result);
+require_once('connect.php'); // Make sure this uses sqlsrv_connect()
 
+$id = $_SESSION["adminid"];
+
+$sql = "SELECT * FROM finalyearproject.admin_info WHERE AdminID = ?";
+$params = array($id);
+
+// Execute the query
+$stmt = sqlsrv_query($connect, $sql, $params);
+
+if ($stmt === false) {
+    die(print_r(sqlsrv_errors(), true));
+}
+
+// Fetch the result as an associative array
+$row49 = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
@@ -149,42 +159,58 @@ $row49 = mysqli_fetch_assoc($result);
             </thead>
             <tbody>
             <?php
-                  $username=$_SESSION["adminusername"];//nshow admin name
-                  $sql = "select * from report order by ReportID Desc";
-                  $result = mysqli_query($connect,$sql);
-                  while($row = mysqli_fetch_assoc($result))
-                  {
-                    $new = $row['JobListingID']; 
-                    $sql2 = "select * from joblisting WHERE JobListingID = '$new' and is_deleted = '0'";
-                    $result2 = mysqli_query($connect,$sql2);
-                    $row2 = mysqli_fetch_assoc($result2);
-                    if(is_array($row2)){
+              $username = $_SESSION["adminusername"]; // show admin name
 
-                    $new2 = $row2['JobCategoryID']; 
-                    $sql3 = "select * from joblisting WHERE JobCategoryID = '$new2' and is_deleted = '0'";
-                    $result3 = mysqli_query($connect,$sql3);
-                    $row3 = mysqli_fetch_assoc($result3);
-                    if(is_array($row3)){
+              $sql = "SELECT * FROM finalyearproject.report ORDER BY ReportID DESC";
+              $stmt = sqlsrv_query($connect, $sql);
 
-                    $new3 = $row2['CompanyID']; 
-                    $sql4 = "select * from company_info WHERE CompanyID = '$new3'and is_deleted = '0'";
-                    $result4 = mysqli_query($connect,$sql4);
-                    $row4 = mysqli_fetch_assoc($result4);
-                    if(is_array($row4)){
+              if ($stmt === false) {
+                  die(print_r(sqlsrv_errors(), true));
+              }
 
-                    $new4 = $row['Job_SeekerID']; 
-                    $sql5 = "select * from job_seekerinfo WHERE Job_SeekerID = '$new4' and is_deleted = '0'";
-                    $result5 = mysqli_query($connect,$sql5);
-                    $row5 = mysqli_fetch_assoc($result5);
-                    if(is_array($row5)){
+              while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+                  $jobListingID = $row['JobListingID'];
 
-                    $new5 = $row2['JobCategoryID']; 
-                    $sql6 = "select * from jobcategory WHERE JobCategoryID = '$new5' and is_deleted = '0'";
-                    $result6 = mysqli_query($connect,$sql6);
-                    $row6 = mysqli_fetch_assoc($result6);
-                    if(is_array($row6)){
+                  $sql2 = "SELECT * FROM finalyearproject.joblisting WHERE JobListingID = ? AND is_deleted = '0'";
+                  $params2 = array($jobListingID);
+                  $stmt2 = sqlsrv_query($connect, $sql2, $params2);
+                  $row2 = sqlsrv_fetch_array($stmt2, SQLSRV_FETCH_ASSOC);
 
-                  ?>
+                  if (is_array($row2)) {
+                      $jobCategoryID = $row2['JobCategoryID'];
+
+                      $sql3 = "SELECT * FROM finalyearproject.joblisting WHERE JobCategoryID = ? AND is_deleted = '0'";
+                      $params3 = array($jobCategoryID);
+                      $stmt3 = sqlsrv_query($connect, $sql3, $params3);
+                      $row3 = sqlsrv_fetch_array($stmt3, SQLSRV_FETCH_ASSOC);
+
+                      if (is_array($row3)) {
+                          $companyID = $row2['CompanyID'];
+
+                          $sql4 = "SELECT * FROM finalyearproject.company_info WHERE CompanyID = ? AND is_deleted = '0'";
+                          $params4 = array($companyID);
+                          $stmt4 = sqlsrv_query($connect, $sql4, $params4);
+                          $row4 = sqlsrv_fetch_array($stmt4, SQLSRV_FETCH_ASSOC);
+
+                          if (is_array($row4)) {
+                              $jobSeekerID = $row['Job_SeekerID'];
+
+                              $sql5 = "SELECT * FROM finalyearproject.job_seekerinfo WHERE Job_SeekerID = ? AND is_deleted = '0'";
+                              $params5 = array($jobSeekerID);
+                              $stmt5 = sqlsrv_query($connect, $sql5, $params5);
+                              $row5 = sqlsrv_fetch_array($stmt5, SQLSRV_FETCH_ASSOC);
+
+                              if (is_array($row5)) {
+                                  $categoryID = $row2['JobCategoryID'];
+
+                                  $sql6 = "SELECT * FROM finalyearproject.jobcategory WHERE JobCategoryID = ? AND is_deleted = '0'";
+                                  $params6 = array($categoryID);
+                                  $stmt6 = sqlsrv_query($connect, $sql6, $params6);
+                                  $row6 = sqlsrv_fetch_array($stmt6, SQLSRV_FETCH_ASSOC);
+
+                                  if (is_array($row6)) {
+                                      // Your output HTML or PHP block goes here...
+              ?>
                   <td><?php echo $row['ReportID']; ?></td>
                   <td><?php echo $row2['JobListingID']; ?></td>
                   <td><?php echo $row2['JobTitle']; ?></td>
@@ -196,8 +222,8 @@ $row49 = mysqli_fetch_assoc($result);
                   <td><?php echo $row5['Job_SeekerID']; ?></td>
                   <td><?php echo $row['Reason_for_report']; ?></td>
                   <td >
-                  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#view<?php echo $new; ?>">View</button>
-                  <div class="modal fade" id="view<?php echo $new; ?>" tabindex="-1" role="dialog"  aria-hidden="true">
+                  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#view<?php echo $row['ReportID']; ?>">View</button>
+                  <div class="modal fade" id="view<?php echo $row['ReportID']; ?>" tabindex="-1" role="dialog"  aria-hidden="true">
                                   <div class="modal-dialog modal-lg modal-dialog-centered"  role="document">
                                     <div class="modal-content">
                                       <div class="modal-header" >
@@ -279,19 +305,27 @@ function confirmation()
 </script>
 
 <?php
+require_once('connect.php'); // Ensure this uses sqlsrv_connect()
 
-	if(isset($_GET['dlt']))
-	{
-		$new=$_GET['jid'];
-		$query = "UPDATE joblisting SET is_deleted = '1' WHERE JobListingID = $new";
-		$result = mysqli_query($connect,$query);
-    
-?>
-            <script type='text/javascript'>
+if (isset($_GET['dlt'])) {
+    $jid = $_GET['jid'];
 
-                window.location.href="AdminReportedJob.php";
-            </script>
+    // Use parameterized query to avoid SQL injection
+    $sql = "UPDATE joblisting SET is_deleted = '1' WHERE JobListingID = ?";
+    $params = array($jid);
+
+    $stmt = sqlsrv_query($connect, $sql, $params);
+
+    if ($stmt === false) {
+        die(print_r(sqlsrv_errors(), true)); // Debug SQL errors
+    }
+    ?>
+
+    <script type="text/javascript">
+        // Choose only ONE destination page
+        window.location.href = "AdminReportedJob.php";
+    </script>
 
 <?php
-  }
+}
 ?>
