@@ -5,7 +5,7 @@ include('connect.php'); // This should be using sqlsrv_connect
 $id = $_SESSION["adminid"];
 
 // Parameterized query to avoid SQL injection
-$sql = "SELECT * FROM admin_info WHERE AdminID = ?";
+$sql = "SELECT * FROM finalyearproject.admin_info WHERE AdminID = ?";
 $params = array($id);
 
 $stmt = sqlsrv_query($connect, $sql, $params);
@@ -17,7 +17,6 @@ if ($stmt === false) {
 $row49 = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
 
 sqlsrv_free_stmt($stmt);
-sqlsrv_close($connect);
 ?>
 
 
@@ -131,21 +130,25 @@ sqlsrv_close($connect);
   </nav>
 
   <?php
-  $lll = "select * from job_seekerinfo where is_deleted = '0'";
-  $qqq = mysqli_query($connect,$lll);
-  $count=0;
-  while($eee = mysqli_fetch_assoc($qqq)){
-    $count++;
-  }
+    // This assumes you've already included connect.php where $connect is your sqlsrv connection
+    $jobSeekerQuery = "SELECT COUNT(*) AS total FROM finalyearproject.job_seekerinfo WHERE is_deleted = '0'";
+    $jobSeekerStmt = sqlsrv_query($connect, $jobSeekerQuery);
 
-  $aaa = "select * from company_info where is_deleted = '0' " ;
-  $bbb = mysqli_query($connect,$aaa);
-  $count2=0;
-  while($ccc = mysqli_fetch_assoc($bbb)){
-    $count2++;
-    
-  }
+    $count = 0;
+
+    if ($jobSeekerStmt && $row = sqlsrv_fetch_array($jobSeekerStmt, SQLSRV_FETCH_ASSOC)) {
+        $count = $row['total'];
+    }
+
+    $companyQuery = "SELECT COUNT(*) AS total FROM finalyearproject.company_info WHERE is_deleted = '0'";
+    $companyStmt = sqlsrv_query($connect, $companyQuery);
+    $count2 = 0;
+
+    if ($companyStmt && $row2 = sqlsrv_fetch_array($companyStmt, SQLSRV_FETCH_ASSOC)) {
+        $count2 = $row2['total'];
+    }
   ?>
+
   <section class="home-section">
    
     <div class="home-content">
@@ -201,31 +204,39 @@ sqlsrv_close($connect);
             <tr>
               
                           <?php
-                          $username=$_SESSION["adminusername"];//nshow admin name
-                          $sql = "select * from joblisting where is_deleted = '0' Order by JobListingID DESC LIMIT 10";
-                          $result = mysqli_query($connect,$sql);
-                          while($row = mysqli_fetch_assoc($result))
-                          {
-                            $new = $row['CompanyID']; 
-                            $sql2 = "select * from company_info WHERE CompanyID = '$new' and is_deleted='0'";
-                            $result2 = mysqli_query($connect,$sql2);
-                            $row2 = mysqli_fetch_assoc($result2);
-                            if(is_array($row2)){
+                            $username = $_SESSION["adminusername"]; // show admin name
 
-                            
-                          ?>
-                          <td><?php echo $row['JobListingID']; ?></td>
-                          <td><?php echo $row['JobTitle']; ?></td>
-                          <td><?php echo $row['JobCategoryID']; ?></td>
-                          
-                          <td><?php echo $row['JobSalary']; ?></td>
-                          <td><?php echo $row2['CompanyName']; ?></td>
-                          <td><?php echo $row['CompanyID']; ?></td>
-                        </tr>
-                        <?php
+                            // Get latest 10 job listings (SQL Server doesn't support LIMIT — use TOP)
+                            $sql = "SELECT TOP 10 * FROM finalyearproject.joblisting WHERE is_deleted = '0' ORDER BY JobListingID DESC";
+                            $stmt = sqlsrv_query($connect, $sql);
+
+                            if ($stmt) {
+                                while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+                                    $companyID = $row['CompanyID'];
+
+                                    // Get company info
+                                    $sql2 = "SELECT * FROM company_info WHERE CompanyID = ? AND is_deleted = '0'";
+                                    $params2 = array($companyID);
+                                    $stmt2 = sqlsrv_query($connect, $sql2, $params2);
+
+                                    if ($stmt2 && $row2 = sqlsrv_fetch_array($stmt2, SQLSRV_FETCH_ASSOC)) {
+                            ?>
+                                    <tr>
+                                        <td><?php echo $row['JobListingID']; ?></td>
+                                        <td><?php echo $row['JobTitle']; ?></td>
+                                        <td><?php echo $row['JobCategoryID']; ?></td>
+                                        <td><?php echo $row['JobSalary']; ?></td>
+                                        <td><?php echo $row2['CompanyName']; ?></td>
+                                        <td><?php echo $row['CompanyID']; ?></td>
+                                    </tr>
+                            <?php
+                                    }
+                                }
                             }
-                          }
-                        ?>
+
+                            sqlsrv_close($connect);
+                            ?>
+
             </tbody>
         </table>
               
