@@ -1,15 +1,27 @@
-<?php include("admin_session.php"); ?>
-<?php
-
+<?php 
+include("admin_session.php");
 require_once('connect.php');
-$id=$_SESSION["adminid"];
-$query = "SELECT * FROM admin_info WHERE AdminID = '$id'";
-$result = mysqli_query($connect,$query);
-$row49 = mysqli_fetch_assoc($result);
 
-$query = "select * from company_info where is_deleted ='0' order by CompanyID DESC";
-$result = mysqli_query($connect,$query);
+$id = $_SESSION["adminid"];
 
+// Query 1: Select admin info
+$query = "SELECT * FROM finalyearproject.admin_info WHERE AdminID = ?";
+$params = array($id);
+$result = sqlsrv_query($connect, $query, $params);
+
+if ($result === false) {
+    die(print_r(sqlsrv_errors(), true));
+}
+
+$row49 = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC);
+
+// Query 2: Select company info (not deleted)
+$query2 = "SELECT * FROM finalyearproject.company_info WHERE is_deleted = '0' ORDER BY CompanyID DESC";
+$result2 = sqlsrv_query($connect, $query2);
+
+if ($result2 === false) {
+    die(print_r(sqlsrv_errors(), true));
+}
 ?>
 
 <!DOCTYPE html>
@@ -153,11 +165,10 @@ $result = mysqli_query($connect,$query);
             <tbody>
             <tr>
                           <?php
-                          
-                          $username=$_SESSION["adminusername"];//nshow admin name
-                          while($row = mysqli_fetch_assoc($result))
-                          {
-                            $cid=$row['CompanyID'];
+                              $username = $_SESSION["adminusername"]; // show admin name
+
+                              while ($row = sqlsrv_fetch_array($result2, SQLSRV_FETCH_ASSOC)) {
+                                  $cid = $row['CompanyID'];
                           ?>
                           <td><?php echo $row['CompanyID']; ?></td>
                           <td><?php echo $row['CompanyName']; ?></td>
@@ -268,18 +279,26 @@ function confirmation()
 </script>
 
 <?php
+    if (isset($_GET['dlt'])) {
+        $cid = $_GET['cid'];
 
-	if(isset($_GET['dlt']))
-	{
-		$cid=$_GET['cid'];
-		$query = "UPDATE company_info SET is_deleted = '1' WHERE CompanyID = $cid ";
-		$result = mysqli_query($connect,$query);
+        // Prepare your SQL query with a parameter placeholder
+        $query = "UPDATE finalyearproject.company_info SET is_deleted = '1' WHERE CompanyID = ?";
+
+        // Prepare parameters as an array
+        $params = array($cid);
+
+        // Execute the query with parameters
+        $result = sqlsrv_query($connect, $query, $params);
+
+        if ($result === false) {
+            // Handle error
+            die(print_r(sqlsrv_errors(), true));
+        }
 ?>
-            <script type='text/javascript'>
-
-                window.location.href="AdminCompanyList.php";
-            </script>
-
+        <script type='text/javascript'>
+            window.location.href = "AdminCompanyList.php";
+        </script>
 <?php
-  }
+    }
 ?>
