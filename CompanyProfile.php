@@ -344,35 +344,6 @@
         die(print_r(sqlsrv_errors(), true));
     }
 ?>
-    
-  //   if(!empty($_FILES["image"]['tmp_name'])){
-  //       $fileName= basename($_FILES["image"]['name']);
-  //       $fileType= pathinfo($fileName,PATHINFO_EXTENSION);
-  //       $allowTypes= array('jpg','png','jpeg','gif');
-  //       if(in_array($fileType,$allowTypes)){
-  //       $image= $_FILES['image']['tmp_name'];
-  //       $imgContent=addslashes(file_get_contents($image));
-  //       }
-  //       $query = "UPDATE company_info SET CompanyUsername='$username',CompanyPassword='$password',CompanyName='$name'
-  //       ,CompanyEmail='$email',CompanySize='$size',CompanyIndustry='$industry',CompanyRegistrationNo='$registrationnumber'
-  //       ,CompanyDescription='$description',CompanyWebsite='$website',CompanyAddress='$address',CompanyPhone='$phone'
-  //       ,CompanyOurTeam='$team',CompanyOurMission='$mission',CompanyOurVision='$vision',CompanyLogo='$imgContent' 
-  //       WHERE CompanyID='$companyid'";
-  //       $result = mysqli_query($connect,$query);
-
-  //   }
-  //   if(empty($imgContent)){
-	// 		$query = "UPDATE company_info SET CompanyUsername='$username',CompanyPassword='$password',CompanyName='$name'
-  //       ,CompanyEmail='$email',CompanySize='$size',CompanyIndustry='$industry',CompanyRegistrationNo='$registrationnumber'
-  //       ,CompanyDescription='$description',CompanyWebsite='$website',CompanyAddress='$address',CompanyPhone='$phone'
-  //       ,CompanyOurTeam='$team',CompanyOurMission='$mission',CompanyOurVision='$vision'
-  //       WHERE CompanyID='$companyid'";
-  //       $result = mysqli_query($connect,$query);
-	// 	}
-    
-    
-	// ?>
-	
 	<script>
 		alert("Update Company Profile Done!");
     window.location.href="CompanyProfile.php";
