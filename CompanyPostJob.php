@@ -1,9 +1,18 @@
 <?php
 require_once('connect.php');
 include('company_session.php');
-$query=mysqli_query($connect,"SELECT * FROM Company_Info where CompanyID='$companyid' and is_deleted = '0'")or die(mysqli_error());
-      $row49=mysqli_fetch_array($query);
+$sql = "SELECT * FROM finalyearproject.Company_Info WHERE CompanyID = ? AND is_deleted = '0'";
+$params = array($companyid);
+
+$query = sqlsrv_query($connect, $sql, $params);
+
+if ($query === false) {
+    die(print_r(sqlsrv_errors(), true));
+}
+
+$row49 = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
 ?>
+
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
   <head>
@@ -142,9 +151,13 @@ $query=mysqli_query($connect,"SELECT * FROM Company_Info where CompanyID='$compa
                                         <select name="category" required class="selectpicker show-tick form-control" data-live-search="true">
                                         <option disabled value="">Select</option>
                                       <?php
-                                       $sql11 = "select * from jobcategory where is_deleted = '0'";
-                                       $result22 = mysqli_query($connect,$sql11);
-                                       while($row33 = mysqli_fetch_assoc($result22))
+                                       $sql11 = "SELECT * FROM finalyearproject.jobcategory where is_deleted = '0'";
+                                       $result22 = sqlsrv_query($connect, $sql11);
+                                       if ($result22 === false) {
+                                          die(print_r(sqlsrv_errors(), true));
+                                      }
+
+                                       while ($row33 = sqlsrv_fetch_array($result22, SQLSRV_FETCH_ASSOC))
                                        {
                                         
                                         ?>
@@ -279,7 +292,6 @@ $query=mysqli_query($connect,"SELECT * FROM Company_Info where CompanyID='$compa
 	{
 		$title = $_POST["title"];
 		$location = $_POST["location"];
-    
 		$category = $_POST["category"];
 		$salary = $_POST["salary"];
     $jobtype = $_POST["jobtype"];
@@ -288,13 +300,25 @@ $query=mysqli_query($connect,"SELECT * FROM Company_Info where CompanyID='$compa
     $companyid = $_SESSION["companyid"];
     $jobcategoryid = $_POST["category"];
 		
-		$query = "INSERT INTO joblisting(JobTitle,JobDescription,JobSalary,JobRequirement,JobType,JobLocation,JobCategoryID,CompanyID,is_deleted)
-		VALUES('$title','$description','$salary','$requirements','$jobtype','$location','$jobcategoryid','$companyid','0')";
-		$result = mysqli_query($connect,$query);
+    $sql = "INSERT INTO finalyearproject.joblisting (
+                JobTitle, JobDescription, JobSalary, JobRequirement, JobType, 
+                JobLocation, JobCategoryID, CompanyID, is_deleted
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, '0')";
+    
+    $params = array($title, $description, $salary, $requirements, $jobtype, $location, $jobcategoryid, $companyid);
+    $result = sqlsrv_query($connect, $sql, $params);
+
+    if ($result === false) {
+        die(print_r(sqlsrv_errors(), true));
+    }
+
+    sqlsrv_close($connect);
+	// 	$query = "INSERT INTO joblisting(JobTitle,JobDescription,JobSalary,JobRequirement,JobType,JobLocation,JobCategoryID,CompanyID,is_deleted)
+	// 	VALUES('$title','$description','$salary','$requirements','$jobtype','$location','$jobcategoryid','$companyid','0')";
+	// 	$result = mysqli_query($connect,$query);
 		
 
-	mysqli_close($connect);
-	
+	// mysqli_close($connect);
 	?>
 	
 	<script>

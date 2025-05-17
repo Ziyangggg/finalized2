@@ -1,8 +1,16 @@
 <?php
 require_once('connect.php');
 include('company_session.php');
-$query=mysqli_query($connect,"SELECT * FROM Company_Info where CompanyID='$companyid' and is_deleted = '0'")or die(mysqli_error());
-      $row49=mysqli_fetch_array($query);
+$sql = "SELECT * FROM finalyearproject.Company_Info WHERE CompanyID = ? AND is_deleted = '0'";
+$params = array($companyid);
+
+$query = sqlsrv_query($connect, $sql, $params);
+
+if ($query === false) {
+    die(print_r(sqlsrv_errors(), true));
+}
+
+$row49 = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -118,26 +126,25 @@ $query=mysqli_query($connect,"SELECT * FROM Company_Info where CompanyID='$compa
             <tr>
                           <?php
                           $companyid = $_SESSION["companyid"];
-                          $query = "select * from joblisting WHERE CompanyID = $companyid and is_deleted='0' Order By JobListingID DESC";
-                          $result = mysqli_query($connect,$query);
+                          $sql = "SELECT * FROM finalyearproject.joblisting WHERE CompanyID = $companyid and is_deleted='0' Order By JobListingID DESC";
+                          $params = array($companyid);
+                          $result = sqlsrv_query($connect, $sql, $params);
                           
                           
-                          $sql3 = "select * from company_info WHERE CompanyID = '$companyid' and is_deleted = '0'";
-                          $result3 = mysqli_query($connect,$sql3);
-                          $row2 = mysqli_fetch_assoc($result3);
+                          $sql3 = "SELECT * FROM finalyearproject.company_info WHERE CompanyID = ? AND is_deleted = '0'";
+                          $params3 = array($companyid);
+                          $result3 = sqlsrv_query($connect, $sql3, $params3);
+                          $row2 = sqlsrv_fetch_array($result3, SQLSRV_FETCH_ASSOC);
 
-                          
-                          
-
-
-                          while($row = mysqli_fetch_assoc($result))
-                          { $categoryid=$row['JobCategoryID'];
-                            $sql4 = "select * from jobcategory  where JobCategoryID= $categoryid and is_deleted = '0'";
-                            $result4 = mysqli_query($connect,$sql4);
-                            $row3 = mysqli_fetch_assoc($result4);
-                            $jid=$row['JobListingID'];
-                            $jid2=$row['JobListingID'];
+                          while ($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)) {
+                              $categoryid = $row['JobCategoryID'];
+                              $sql4 = "SELECT * FROM finalyearproject.jobcategory WHERE JobCategoryID = ? AND is_deleted = '0'";
+                              $params4 = array($categoryid);
+                              $result4 = sqlsrv_query($connect, $sql4, $params4);
+                              $row3 = sqlsrv_fetch_array($result4, SQLSRV_FETCH_ASSOC);
+                              $jid = $row['JobListingID'];
                           ?>
+
                           <td><?php echo $row['JobListingID']; ?></td>
                           <td><?php echo $row['JobTitle']; ?></td>
                           <td><?php echo $row['JobType']; ?></td>
@@ -180,10 +187,6 @@ $query=mysqli_query($connect,"SELECT * FROM Company_Info where CompanyID='$compa
                                         <h5>Company Registration No.</h5>
 												                <p><li><?php echo $row2["CompanyRegistrationNo"]; ?></li></p>
                                       </div>
-
-                                      
-                                    
-                                    
                                     </div>
                                       <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -205,8 +208,6 @@ $query=mysqli_query($connect,"SELECT * FROM Company_Info where CompanyID='$compa
                                         <div class="modal-body">
                                         
                                         <div class="company-detail-wrapper">
-
-                                          
     
                                               <input type="hidden"  name="jobid" value="<?php echo $row['JobListingID'] ?>">
 
@@ -228,14 +229,13 @@ $query=mysqli_query($connect,"SELECT * FROM Company_Info where CompanyID='$compa
                                                   <select name="category"  >
                                                     <option disabled value="">Select</option>
                                                     <?php
-                                                    $sql11 = "select * from jobcategory where is_deleted = '0'";
-                                                    $result22 = mysqli_query($connect,$sql11);
-                                                    while($row33 = mysqli_fetch_assoc($result22))
+                                                    $sql11 = "select * from finalyearproject.jobcategory where is_deleted = '0'";
+                                                    $result22 = sqlsrv_query($connect, $sql11);
+                                                    while ($row33 = sqlsrv_fetch_array($result22, SQLSRV_FETCH_ASSOC))
                                                     {
                                                       
                                                       ?>
                                                       <option value="<?php echo $row33['JobCategoryID']?>" data-content="<span class='label label-warning'><?php echo $row33['JobCategoryName']?></span>"><?php echo $row33['JobCategoryName']?></option>
-                                                      
                                                       <?php
                                                     }
                                                       ?>

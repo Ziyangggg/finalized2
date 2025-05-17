@@ -4,10 +4,18 @@
     <title>Company Profile</title>
     <meta charset="UTF-8">
     <?php
-      require_once('connect.php');
-      include('company_session.php');
-      $query=mysqli_query($connect,"SELECT * FROM Company_Info where CompanyID='$companyid' and is_deleted = '0'")or die(mysqli_error());
-      $row=mysqli_fetch_array($query);
+    require_once('connect.php');
+    include('company_session.php');
+
+    $sql = "SELECT * FROM finalyearproject.Company_Info WHERE CompanyID = ? AND is_deleted = '0'";
+    $params = array($companyid);
+    $query = sqlsrv_query($connect, $sql, $params);
+
+    if ($query === false) {
+        die(print_r(sqlsrv_errors(), true));
+    }
+
+    $row = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
     ?>
 
     <link rel="stylesheet" href="style.css">
@@ -276,8 +284,14 @@
 
 <?php
 	include("connect.php");
-	$query=mysqli_query($connect,"SELECT * FROM Company_Info where CompanyID='$companyid'and is_deleted = '0'")or die(mysqli_error());
-  $row=mysqli_fetch_array($query);
+	$sql = "SELECT * FROM finalyearproject.company_info WHERE CompanyID = ? AND is_deleted = '0'";
+  $params = array($companyid);
+  $query = sqlsrv_query($connect, $sql, $params);
+  if ($query === false) {
+      die(print_r(sqlsrv_errors(), true));
+  }
+  $row = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+
 	if(isset($_POST["submit"]))
 	{
 		$name = $_POST["name"];
@@ -294,35 +308,70 @@
 		$team = $_POST["team"];
     $mission = $_POST["mission"];
     $vision = $_POST["vision"];
-    
-    
-    if(!empty($_FILES["image"]['tmp_name'])){
-        $fileName= basename($_FILES["image"]['name']);
-        $fileType= pathinfo($fileName,PATHINFO_EXTENSION);
-        $allowTypes= array('jpg','png','jpeg','gif');
-        if(in_array($fileType,$allowTypes)){
-        $image= $_FILES['image']['tmp_name'];
-        $imgContent=addslashes(file_get_contents($image));
-        }
-        $query = "UPDATE company_info SET CompanyUsername='$username',CompanyPassword='$password',CompanyName='$name'
-        ,CompanyEmail='$email',CompanySize='$size',CompanyIndustry='$industry',CompanyRegistrationNo='$registrationnumber'
-        ,CompanyDescription='$description',CompanyWebsite='$website',CompanyAddress='$address',CompanyPhone='$phone'
-        ,CompanyOurTeam='$team',CompanyOurMission='$mission',CompanyOurVision='$vision',CompanyLogo='$imgContent' 
-        WHERE CompanyID='$companyid'";
-        $result = mysqli_query($connect,$query);
 
+    // Check if there is an uploaded image or not
+    $imgContent = null;
+    if (!empty($_FILES["image"]["tmp_name"])) {
+        $fileName = basename($_FILES["image"]["name"]);
+        $fileType = pathinfo($fileName, PATHINFO_EXTENSION);
+        $allowTypes = array('jpg', 'png', 'jpeg', 'gif');
+
+        if (in_array($fileType, $allowTypes)) {
+            $image = $_FILES["image"]["tmp_name"];
+            $imgContent = file_get_contents($image);
+        }
     }
-    if(empty($imgContent)){
-			$query = "UPDATE company_info SET CompanyUsername='$username',CompanyPassword='$password',CompanyName='$name'
-        ,CompanyEmail='$email',CompanySize='$size',CompanyIndustry='$industry',CompanyRegistrationNo='$registrationnumber'
-        ,CompanyDescription='$description',CompanyWebsite='$website',CompanyAddress='$address',CompanyPhone='$phone'
-        ,CompanyOurTeam='$team',CompanyOurMission='$mission',CompanyOurVision='$vision'
-        WHERE CompanyID='$companyid'";
-        $result = mysqli_query($connect,$query);
-		}
+
+    if ($imgContent !== null) {
+        $sql_update = "UPDATE finalyearproject.company_info SET 
+            CompanyUsername = ?, CompanyPassword = ?, CompanyName = ?, CompanyEmail = ?, CompanySize = ?, 
+            CompanyIndustry = ?, CompanyRegistrationNo = ?, CompanyDescription = ?, CompanyWebsite = ?, 
+            CompanyAddress = ?, CompanyPhone = ?, CompanyOurTeam = ?, CompanyOurMission = ?, CompanyOurVision = ?, 
+            CompanyLogo = ?
+            WHERE CompanyID = ?";
+        $params_update = array($username, $password, $name, $email, $size, $industry, $registrationnumber, $description, $website, $address, $phone, $team, $mission, $vision, $imgContent, $companyid);
+    } else {
+        $sql_update = "UPDATE finalyearproject.company_info SET 
+            CompanyUsername = ?, CompanyPassword = ?, CompanyName = ?, CompanyEmail = ?, CompanySize = ?, 
+            CompanyIndustry = ?, CompanyRegistrationNo = ?, CompanyDescription = ?, CompanyWebsite = ?, 
+            CompanyAddress = ?, CompanyPhone = ?, CompanyOurTeam = ?, CompanyOurMission = ?, CompanyOurVision = ?
+            WHERE CompanyID = ?";
+        $params_update = array($username, $password, $name, $email, $size, $industry, $registrationnumber, $description, $website, $address, $phone, $team, $mission, $vision, $companyid);
+    }
+
+    $result = sqlsrv_query($connect, $sql_update, $params_update);
+    if ($result === false) {
+        die(print_r(sqlsrv_errors(), true));
+    }
+?>
+    
+  //   if(!empty($_FILES["image"]['tmp_name'])){
+  //       $fileName= basename($_FILES["image"]['name']);
+  //       $fileType= pathinfo($fileName,PATHINFO_EXTENSION);
+  //       $allowTypes= array('jpg','png','jpeg','gif');
+  //       if(in_array($fileType,$allowTypes)){
+  //       $image= $_FILES['image']['tmp_name'];
+  //       $imgContent=addslashes(file_get_contents($image));
+  //       }
+  //       $query = "UPDATE company_info SET CompanyUsername='$username',CompanyPassword='$password',CompanyName='$name'
+  //       ,CompanyEmail='$email',CompanySize='$size',CompanyIndustry='$industry',CompanyRegistrationNo='$registrationnumber'
+  //       ,CompanyDescription='$description',CompanyWebsite='$website',CompanyAddress='$address',CompanyPhone='$phone'
+  //       ,CompanyOurTeam='$team',CompanyOurMission='$mission',CompanyOurVision='$vision',CompanyLogo='$imgContent' 
+  //       WHERE CompanyID='$companyid'";
+  //       $result = mysqli_query($connect,$query);
+
+  //   }
+  //   if(empty($imgContent)){
+	// 		$query = "UPDATE company_info SET CompanyUsername='$username',CompanyPassword='$password',CompanyName='$name'
+  //       ,CompanyEmail='$email',CompanySize='$size',CompanyIndustry='$industry',CompanyRegistrationNo='$registrationnumber'
+  //       ,CompanyDescription='$description',CompanyWebsite='$website',CompanyAddress='$address',CompanyPhone='$phone'
+  //       ,CompanyOurTeam='$team',CompanyOurMission='$mission',CompanyOurVision='$vision'
+  //       WHERE CompanyID='$companyid'";
+  //       $result = mysqli_query($connect,$query);
+	// 	}
     
     
-	?>
+	// ?>
 	
 	<script>
 		alert("Update Company Profile Done!");

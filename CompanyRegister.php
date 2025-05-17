@@ -214,33 +214,87 @@
 		$team = $_POST["team"];
     $mission = $_POST["mission"];
     $vision = $_POST["vision"];
-    
-    if(!empty($_FILES["image"]['tmp_name'])){
-      $fileName= basename($_FILES["image"]['name']);
-      $fileType= pathinfo($fileName,PATHINFO_EXTENSION);
-      $allowTypes= array('jpg','png','jpeg','gif');
-      if(in_array($fileType,$allowTypes)){
-      $image= $_FILES['image']['tmp_name'];
-      $imgContent=addslashes(file_get_contents($image));
-      }
-      $query = "INSERT INTO company_info(CompanyUsername,CompanyPassword,CompanyName,CompanyEmail,CompanySize,CompanyIndustry,CompanyRegistrationNo,CompanyDescription,CompanyWebsite,CompanyAddress,CompanyPhone,CompanyOurTeam,CompanyOurMission,CompanyOurVision,CompanyLogo,is_deleted)
-		  VALUES('$username','$password','$name','$email','$size','$industry','$registrationnumber','$description','$website','$address','$phone','$team','$mission','$vision','$imgContent','0')";
-		
-      $result = mysqli_query($connect,$query);
+    $imgContent = null;
 
+    // 处理图片上传（可选）
+    if (!empty($_FILES["image"]['tmp_name'])) {
+        $fileName = basename($_FILES["image"]['name']);
+        $fileType = pathinfo($fileName, PATHINFO_EXTENSION);
+        $allowTypes = array('jpg', 'png', 'jpeg', 'gif');
+
+        if (in_array(strtolower($fileType), $allowTypes)) {
+            $image = $_FILES['image']['tmp_name'];
+            $imgContent = file_get_contents($image); // 注意：不加 addslashes
+        }
     }
 
-    if(empty($imgContent)){
-      $query = "INSERT INTO company_info(CompanyUsername,CompanyPassword,CompanyName,CompanyEmail,CompanySize,CompanyIndustry,CompanyRegistrationNo,CompanyDescription,CompanyWebsite,CompanyAddress,CompanyPhone,CompanyOurTeam,CompanyOurMission,CompanyOurVision,,is_deleted)
-		  VALUES('$username','$password','$name','$email','$size','$industry','$registrationnumber','$description','$website','$address','$phone','$team','$mission','$vision','0')";
-		
-        $result = mysqli_query($connect,$query);
-		}
-		
-		
-		
+    if ($imgContent !== null) {
+        $sql = "INSERT INTO finalyearproject.company_info 
+            (CompanyUsername, CompanyPassword, CompanyName, CompanyEmail, CompanySize, CompanyIndustry, 
+             CompanyRegistrationNo, CompanyDescription, CompanyWebsite, CompanyAddress, CompanyPhone, 
+             CompanyOurTeam, CompanyOurMission, CompanyOurVision, CompanyLogo, is_deleted)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '0')";
 
-	mysqli_close($connect);
+        $params = array(
+                array($username, SQLSRV_PARAM_IN),
+                array($password, SQLSRV_PARAM_IN),
+                array($name, SQLSRV_PARAM_IN),
+                array($email, SQLSRV_PARAM_IN),
+                array($size, SQLSRV_PARAM_IN),
+                array($industry, SQLSRV_PARAM_IN),
+                array($registrationnumber, SQLSRV_PARAM_IN),
+                array($description, SQLSRV_PARAM_IN),
+                array($website, SQLSRV_PARAM_IN),
+                array($address, SQLSRV_PARAM_IN),
+                array($phone, SQLSRV_PARAM_IN),
+                array($team, SQLSRV_PARAM_IN),
+                array($mission, SQLSRV_PARAM_IN),
+                array($vision, SQLSRV_PARAM_IN),
+                array($imgContent, SQLSRV_PARAM_IN, SQLSRV_PHPTYPE_STREAM(SQLSRV_ENC_BINARY), SQLSRV_SQLTYPE_VARBINARY('max'))
+            );
+        // $params = array($username, $password, $name, $email, $size, $industry, $registrationnumber,
+        //                 $description, $website, $address, $phone, $team, $mission, $vision, $imgContent);
+
+    } else {
+        $sql = "INSERT INTO finalyearproject.company_info 
+            (CompanyUsername, CompanyPassword, CompanyName, CompanyEmail, CompanySize, CompanyIndustry, 
+             CompanyRegistrationNo, CompanyDescription, CompanyWebsite, CompanyAddress, CompanyPhone, 
+             CompanyOurTeam, CompanyOurMission, CompanyOurVision, is_deleted)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '0')";
+
+        $params = array($username, $password, $name, $email, $size, $industry, $registrationnumber,
+                        $description, $website, $address, $phone, $team, $mission, $vision);
+    }
+
+    $stmt = sqlsrv_query($connect, $sql, $params);
+
+    if ($stmt === false) {
+        die(print_r(sqlsrv_errors(), true));
+    }
+
+    sqlsrv_close($connect);
+  //   if(!empty($_FILES["image"]['tmp_name'])){
+  //     $fileName= basename($_FILES["image"]['name']);
+  //     $fileType= pathinfo($fileName,PATHINFO_EXTENSION);
+  //     $allowTypes= array('jpg','png','jpeg','gif');
+  //     if(in_array($fileType,$allowTypes)){
+  //     $image= $_FILES['image']['tmp_name'];
+  //     $imgContent=addslashes(file_get_contents($image));
+  //     }
+  //     $query = "INSERT INTO company_info(CompanyUsername,CompanyPassword,CompanyName,CompanyEmail,CompanySize,CompanyIndustry,CompanyRegistrationNo,CompanyDescription,CompanyWebsite,CompanyAddress,CompanyPhone,CompanyOurTeam,CompanyOurMission,CompanyOurVision,CompanyLogo,is_deleted)
+	// 	  VALUES('$username','$password','$name','$email','$size','$industry','$registrationnumber','$description','$website','$address','$phone','$team','$mission','$vision','$imgContent','0')";
+		
+  //     $result = mysqli_query($connect,$query);
+
+  //   }
+
+  //   if(empty($imgContent)){
+  //     $query = "INSERT INTO company_info(CompanyUsername,CompanyPassword,CompanyName,CompanyEmail,CompanySize,CompanyIndustry,CompanyRegistrationNo,CompanyDescription,CompanyWebsite,CompanyAddress,CompanyPhone,CompanyOurTeam,CompanyOurMission,CompanyOurVision,,is_deleted)
+	// 	  VALUES('$username','$password','$name','$email','$size','$industry','$registrationnumber','$description','$website','$address','$phone','$team','$mission','$vision','0')";
+		
+  //       $result = mysqli_query($connect,$query);
+	// 	}
+	// mysqli_close($connect);
 	
 	?>
 	
