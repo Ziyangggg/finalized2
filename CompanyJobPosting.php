@@ -324,8 +324,13 @@ function confirmation()
 	if(isset($_GET['dlt']))
 	{
 		$jid=$_GET['jid'];
-		$query = "UPDATE joblisting SET is_deleted = '1' WHERE JobListingID = $jid";
-		$result = mysqli_query($connect,$query);
+		$query = "UPDATE finalyearproject.joblisting SET is_deleted = '1' WHERE JobListingID = $jid";
+		$params = array($jid);
+		$result = sqlsrv_query($connect, $query, $params);
+		if ($result === false) 
+    {
+			die(print_r(sqlsrv_errors(), true));
+		}
 ?>
             <script type='text/javascript'>
 
@@ -340,7 +345,6 @@ function confirmation()
     $jobid = $_POST["jobid"];
     $title = $_POST["title"];
 		$location = $_POST["location"];
-    
 		$category = $_POST["category"];
 		$salary = $_POST["salary"];
     $jobtype = $_POST["jobtype"];
@@ -349,8 +353,13 @@ function confirmation()
     $companyid = $_SESSION["companyid"];
     $jobcategoryid = $_POST["category"];
     
-    $query = "UPDATE joblisting SET JobTitle = '$title' ,JobDescription = '$description' ,JobSalary = '$salary' ,JobRequirement = '$requirements' ,JobType = '$jobtype' ,JobLocation = '$location'  ,JobCategoryID = '$jobcategoryid'   WHERE JobListingID =$jobid";
-    $result = mysqli_query($connect,$query) or die(mysqli_error($connect));
+    $query = "UPDATE finalyearproject.joblisting SET JobTitle = '$title' ,JobDescription = '$description' ,JobSalary = '$salary' ,JobRequirement = '$requirements' ,JobType = '$jobtype' ,JobLocation = '$location'  ,JobCategoryID = '$jobcategoryid'   WHERE JobListingID =$jobid";
+    $params = array($title, $description, $salary, $requirements, $jobtype, $location, $jobcategoryid, $jobid);
+    $result = sqlsrv_query($connect, $query, $params);
+
+    if ($result === false) {
+        die(print_r(sqlsrv_errors(), true));
+    }
  ?>   
 
     <script type='text/javascript'>

@@ -26,7 +26,7 @@
         <div class="form-content">
         <div class="signup-form">
           <div class="title">Company Sign Up</div>
-          <form class="post-form-wrapper"  method="POST" autocomplete="off" enctype="multipart/form-data">
+          <form id="registrationForm" class="post-form-wrapper"  method="POST" autocomplete="off" enctype="multipart/form-data">
         
             <div class="row gap-20">
               <div class="clear"></div>
@@ -169,7 +169,7 @@
                                               
                 <div class="form-group bootstrap3-wysihtml5-wrapper">
                 <label>Company Logo</label>
-                <input accept="image/*" type="file" name="image"  required >
+                <input accept="image/*" type="file" name="image" id="image" required >
                 </div>
                       
                 </div>
@@ -180,7 +180,7 @@
 
             </div>
             <div class="button input-box">
-                <input type="submit" value="Sumbit" name="submit">
+                <input type="submit" value="Submit" name="submit">
               </div>
               <div class="text sign-up-text">Already have an account? <a href="CompanyLogin.php">Login now</a></div>
             </div>
@@ -192,6 +192,38 @@
     </div>
   </div>
 </div>
+<script>
+  // File size validation before form submission
+  document.getElementById('registrationForm').addEventListener('submit', function(event) {
+    const fileInput = document.getElementById('image');
+    const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+    
+    if (fileInput.files.length > 0) {
+      const fileSize = fileInput.files[0].size;
+      
+      if (fileSize > maxSize) {
+        event.preventDefault(); // Prevent form submission
+        alert('Error: File size exceeds 2MB. Please choose a smaller file.');
+        return false;
+      }
+    }
+  });
+
+  // Real-time validation when file is selected
+  document.getElementById('image').addEventListener('change', function() {
+    const fileInput = this;
+    const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+    
+    if (fileInput.files.length > 0) {
+      const fileSize = fileInput.files[0].size;
+      
+      if (fileSize > maxSize) {
+        alert('Error: File size exceeds 2MB. Please choose a smaller file.');
+        fileInput.value = ''; // Clear the input
+      }
+    }
+  });
+</script>
 </body>
 </html>
 
@@ -200,33 +232,76 @@
 	
 	if(isset($_POST["submit"]))
 	{
-		$name = $_POST["companyname"];
-		$username = $_POST["companyusername"];
-    $address = $_POST["address"];
+		$name = trim($_POST["companyname"]);
+		$username = trim($_POST["companyusername"]);
+    $address = trim($_POST["address"]);
 		$password = $_POST["password"];
-    $registrationnumber = $_POST["registrationnumber"];
-    $industry = $_POST["industry"];
-    $size = $_POST["size"];
-    $website = $_POST["website"];
-    $phone = $_POST["phone"];
-    $email = $_POST["email"];
-    $description = $_POST["description"];
-		$team = $_POST["team"];
-    $mission = $_POST["mission"];
-    $vision = $_POST["vision"];
+    $registrationnumber = trim($_POST["registrationnumber"]);
+    $industry = trim($_POST["industry"]);
+    $size = (int)$_POST["size"];
+    $website = trim($_POST["website"]);
+    $phone = trim($_POST["phone"]);
+    $email = trim($_POST["email"]);
+    $description = trim($_POST["description"]);
+    $team = trim($_POST["team"]);
+    $mission = trim($_POST["mission"]);
+    $vision = trim($_POST["vision"]);
     $imgContent = null;
+    $error = false;
+    $errorMsg = "";
 
-    // 处理图片上传（可选）
-    if (!empty($_FILES["image"]['tmp_name'])) {
-        $fileName = basename($_FILES["image"]['name']);
-        $fileType = pathinfo($fileName, PATHINFO_EXTENSION);
-        $allowTypes = array('jpg', 'png', 'jpeg', 'gif');
-
-        if (in_array(strtolower($fileType), $allowTypes)) {
-            $image = $_FILES['image']['tmp_name'];
-            $imgContent = file_get_contents($image); // 注意：不加 addslashes
+    // Check if username already exists
+    $checkUsername = "SELECT COUNT(*) as count FROM finalyearproject.company_info WHERE CompanyUsername = ?";
+    $params = array($username);
+    $stmt = sqlsrv_query($connect, $checkUsername, $params);
+    
+    if ($stmt === false) {
+        $_SESSION['error'] = "Database error: " . print_r(sqlsrv_errors(), true);
+        $error = true;
+    } else {
+        $row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+        if ($row['count'] > 0) {
+            $_SESSION['error'] = "Username already exists. Please choose another one.";
+            $errorMsg = "Username already exists. Please choose another one.";
+            $error = true;
         }
     }
+
+    // Handle image upload
+    if (!$error && isset($_FILES["image"]) && !empty($_FILES["image"]['tmp_name'])) {
+        $fileName = basename($_FILES["image"]['name']);
+        $fileType = pathinfo($fileName, PATHINFO_EXTENSION);
+        $fileSize = $_FILES["image"]['size'];
+        $maxFileSize = 2 * 1024 * 1024; // 2MB limit
+        $allowTypes = array('jpg', 'png', 'jpeg', 'gif');
+        
+        // Validate file size
+        if ($fileSize > $maxFileSize) {
+            $_SESSION['error'] = "Error: File size exceeds 2MB. Please choose a smaller file.";
+            $errorMsg = "Error: File size exceeds 2MB. Please choose a smaller file.";
+            $error = true;
+        }
+        // Validate file type
+        else if (!in_array(strtolower($fileType), $allowTypes)) {
+            $_SESSION['error'] = "Error: Only JPG, PNG & GIF files are allowed.";
+            $errorMsg = "Error: Only JPG, PNG & GIF files are allowed.";
+            $error = true;
+        }
+        else {
+            $image = $_FILES['image']['tmp_name'];
+            $imgContent = file_get_contents($image);
+        }
+    }
+
+    // If there are errors, show error message and stop processing
+    if ($error) {
+        echo "<script>alert('$errorMsg');</script>";
+    } else {
+
+    // If no errors, proceed with registration
+    if (!$error) {
+        // Hash the password for security
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
     if ($imgContent !== null) {
         $sql = "INSERT INTO finalyearproject.company_info 
@@ -237,7 +312,7 @@
 
         $params = array(
                 array($username, SQLSRV_PARAM_IN),
-                array($password, SQLSRV_PARAM_IN),
+                array($hashed_password, SQLSRV_PARAM_IN), // Store hashed password
                 array($name, SQLSRV_PARAM_IN),
                 array($email, SQLSRV_PARAM_IN),
                 array($size, SQLSRV_PARAM_IN),
@@ -252,8 +327,6 @@
                 array($vision, SQLSRV_PARAM_IN),
                 array($imgContent, SQLSRV_PARAM_IN, SQLSRV_PHPTYPE_STREAM(SQLSRV_ENC_BINARY), SQLSRV_SQLTYPE_VARBINARY('max'))
             );
-        // $params = array($username, $password, $name, $email, $size, $industry, $registrationnumber,
-        //                 $description, $website, $address, $phone, $team, $mission, $vision, $imgContent);
 
     } else {
         $sql = "INSERT INTO finalyearproject.company_info 
@@ -262,45 +335,23 @@
              CompanyOurTeam, CompanyOurMission, CompanyOurVision, is_deleted)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '0')";
 
-        $params = array($username, $password, $name, $email, $size, $industry, $registrationnumber,
+        $params = array($username, $hashed_password, $name, $email, $size, $industry, $registrationnumber,
                         $description, $website, $address, $phone, $team, $mission, $vision);
     }
 
     $stmt = sqlsrv_query($connect, $sql, $params);
 
     if ($stmt === false) {
-        die(print_r(sqlsrv_errors(), true));
+        echo "<script>alert('Registration failed: " . str_replace("'", "\'", print_r(sqlsrv_errors(), true)) . "');</script>";
+    } else {
+            echo "<script>
+                alert('Registration successful!');
+                window.location.href = 'CompanyLogin.php';
+            </script>";
+        }
     }
-
+    
     sqlsrv_close($connect);
-  //   if(!empty($_FILES["image"]['tmp_name'])){
-  //     $fileName= basename($_FILES["image"]['name']);
-  //     $fileType= pathinfo($fileName,PATHINFO_EXTENSION);
-  //     $allowTypes= array('jpg','png','jpeg','gif');
-  //     if(in_array($fileType,$allowTypes)){
-  //     $image= $_FILES['image']['tmp_name'];
-  //     $imgContent=addslashes(file_get_contents($image));
-  //     }
-  //     $query = "INSERT INTO company_info(CompanyUsername,CompanyPassword,CompanyName,CompanyEmail,CompanySize,CompanyIndustry,CompanyRegistrationNo,CompanyDescription,CompanyWebsite,CompanyAddress,CompanyPhone,CompanyOurTeam,CompanyOurMission,CompanyOurVision,CompanyLogo,is_deleted)
-	// 	  VALUES('$username','$password','$name','$email','$size','$industry','$registrationnumber','$description','$website','$address','$phone','$team','$mission','$vision','$imgContent','0')";
-		
-  //     $result = mysqli_query($connect,$query);
-
-  //   }
-
-  //   if(empty($imgContent)){
-  //     $query = "INSERT INTO company_info(CompanyUsername,CompanyPassword,CompanyName,CompanyEmail,CompanySize,CompanyIndustry,CompanyRegistrationNo,CompanyDescription,CompanyWebsite,CompanyAddress,CompanyPhone,CompanyOurTeam,CompanyOurMission,CompanyOurVision,,is_deleted)
-	// 	  VALUES('$username','$password','$name','$email','$size','$industry','$registrationnumber','$description','$website','$address','$phone','$team','$mission','$vision','0')";
-		
-  //       $result = mysqli_query($connect,$query);
-	// 	}
-	// mysqli_close($connect);
-	
-	?>
-	
-	<script>
-		alert("Add Company Profile Done!");
-	</script>
-	
-	<?php
-	}
+  }
+}
+?>

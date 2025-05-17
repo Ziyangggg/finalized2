@@ -3,9 +3,15 @@ require('fpdf/fpdf.php');
 require_once('connect.php');
 
 $resumeid=$_GET['resumeid'];
-$query="SELECT * FROM resume_jobseeker where ResumeID=$resumeid";
-$result = mysqli_query($connect, $query);
-$row=mysqli_fetch_array($result);
+$query="SELECT * FROM finalyearproject.resume_jobseeker where ResumeID=$resumeid";
+$params = array($resumeid);
+$stmt = sqlsrv_query($connect, $query, $params);
+
+if ($stmt === false) {
+    die(print_r(sqlsrv_errors(), true));
+}
+
+$row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
 
 class PDF extends FPDF
 {
