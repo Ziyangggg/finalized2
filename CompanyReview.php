@@ -1,8 +1,16 @@
 <?php
 require_once('connect.php');
 include('company_session.php');
-$query=mysqli_query($connect,"SELECT * FROM Company_Info where CompanyID='$companyid' and is_deleted = '0'")or die(mysqli_error());
-      $row49=mysqli_fetch_array($query);
+$sql = "SELECT * FROM finalyearproject.Company_Info WHERE CompanyID = ? AND is_deleted = '0'";
+$params = array($companyid);
+
+$query = sqlsrv_query($connect, $sql, $params);
+
+if ($query === false) {
+    die(print_r(sqlsrv_errors(), true));
+}
+
+$row49 = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -102,20 +110,24 @@ $query=mysqli_query($connect,"SELECT * FROM Company_Info where CompanyID='$compa
               <tr>
                           <?php
                           $companyid = $_SESSION["companyid"];
-                          $query = "select * from feedback WHERE CompanyID = $companyid ";
-                          $result = mysqli_query($connect,$query);
-                          while($row = mysqli_fetch_assoc($result))
+                          $query = "SELECT * FROM finalyearproject.feedback WHERE CompanyID = $companyid ";
+                          $params = array($companyid);
+                          $result = sqlsrv_query($connect, $query, $params);
+
+                          while ($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC))
                           {
                             $new = $row['Job_SeekerID']; 
-                            $sql2 = "select * from job_seekerinfo WHERE Job_SeekerID = '$new'and is_deleted = '0'";
-                            $result2 = mysqli_query($connect,$sql2);
-                            $row2 = mysqli_fetch_assoc($result2);
+                            $sql2 = "SELECT * FROM finalyearproject.job_seekerinfo WHERE Job_SeekerID = '$new'and is_deleted = '0'";
+                            $params2 = array($new);
+                            $result2 = sqlsrv_query($connect, $sql2, $params2);
+                            $row2 = sqlsrv_fetch_array($result2, SQLSRV_FETCH_ASSOC);
+
                             if(is_array($row2)){
-                            
                             $new2 = $row['CompanyID']; 
-                            $sql3 = "select CompanyName from company_info WHERE CompanyID = '$new2'and is_deleted = '0'";
-                            $result3 = mysqli_query($connect,$sql3);
-                            $row3 = mysqli_fetch_assoc($result3);
+                            $sql3 = "SELECT CompanyName FROM finalyearproject.company_info WHERE CompanyID = '$new2'and is_deleted = '0'";
+                            $params3 = array($new2);
+                            $result3 = sqlsrv_query($connect, $sql3, $params3);
+                            $row3 = sqlsrv_fetch_array($result3, SQLSRV_FETCH_ASSOC);
                             if(is_array($row3)){
                           ?>
 

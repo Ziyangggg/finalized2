@@ -56,42 +56,40 @@
 </html>
 
 <?php
-  session_start();
-	include("connect.php");
-	
-	if(isset($_POST["submit"]))
-	{
-	$username = $_POST["username"];
-	$password = $_POST["password"];
-	
-	//$username = stripcslashes($username);
-	//$password = stripcslashes($password);
-	//$username = mysqli_real_escape_string($connect,$username);
-	//$password = mysqli_real_escape_string($connect,$password);
-	
-	$query = "SELECT * FROM company_info where CompanyUsername = '$username' and CompanyPassword = '$password' and is_deleted='0'";
-	$result = mysqli_query($connect,$query);
-	$row = mysqli_fetch_array($result);
-	//$count = mysqli_num_rows($result);
-	
-	if(is_array($row))
-  {
-    $_SESSION["username"] = $row["CompanyUsername"];
-		$_SESSION["password"] = $row["CompanyPassword"];
-    $_SESSION["companyid"] = $row["CompanyID"];
+session_start();
+include("connect.php");
 
-    echo"<script>
-		alert('Login successfully.');
-		window.location.replace('CompanyDashboard.php');
-		</script>";
+if (isset($_POST["submit"])) {
+    $username = $_POST["username"];
+    $password = $_POST["password"];
 
-	}
-  else
-	{
-		echo"<script>
-		alert('Login unsuccessfully.');
-		</script>";
-	}
+    $query = "SELECT * FROM finalyearproject.company_info WHERE CompanyUsername = ? AND CompanyPassword = ? AND is_deleted = '0'";
+    $params = array($username, $password);
+
+    $stmt = sqlsrv_query($connect, $query, $params);
+
+    if ($stmt === false) {
+        die(print_r(sqlsrv_errors(), true));
+    }
+
+    $row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+
+    if (is_array($row)) {
+        $_SESSION["username"] = $row["CompanyUsername"];
+        $_SESSION["password"] = $row["CompanyPassword"];
+        $_SESSION["companyid"] = $row["CompanyID"];
+
+        echo "<script>
+            alert('Login successfully.');
+            window.location.replace('CompanyDashboard.php');
+        </script>";
+    } else {
+        echo "<script>
+            alert('Login unsuccessfully.');
+        </script>";
+    }
+
+    sqlsrv_free_stmt($stmt);
+    sqlsrv_close($conn);
 }
-mysqli_close($connect);
 ?>
