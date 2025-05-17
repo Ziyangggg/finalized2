@@ -37,7 +37,7 @@
                     <input type="text" name="username" placeholder="Enter your username" required>
                     </div>
                     <div class="input-box">
-                    <i class="fas fa-lock"></i>
+                    <i class="fas fa-lock"></i> 
                     <input type="password" name="password" placeholder="Enter your password" required>
                     </div>
                     <div class="button input-box">
