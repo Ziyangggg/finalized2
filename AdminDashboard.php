@@ -1,12 +1,18 @@
-<?php include("admin_session.php"); ?>
+<?php 
+include("admin_session.php"); // Make sure this checks role == 'admin'
+include("connect.php"); // Uses sqlsrv_connect
+?>
+
 <?php
-include('connect.php'); // This should be using sqlsrv_connect
+$userid = $_SESSION["userid"]; // This is the UserID from `users` table
 
-$id = $_SESSION["adminid"];
+// Fetch admin profile details from admin_info using UserID as foreign key
+$sql = "SELECT ai.* 
+        FROM finalyearproject.admin_info ai
+        JOIN finalyearproject.users u ON ai.AdminID = u.UserID
+        WHERE ai.AdminID = ?";
 
-// Parameterized query to avoid SQL injection
-$sql = "SELECT * FROM finalyearproject.admin_info WHERE AdminID = ?";
-$params = array($id);
+$params = array($userid);
 
 $stmt = sqlsrv_query($connect, $sql, $params);
 
@@ -14,8 +20,7 @@ if ($stmt === false) {
     die(print_r(sqlsrv_errors(), true));
 }
 
-$row49 = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
-
+$admin = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
 sqlsrv_free_stmt($stmt);
 ?>
 

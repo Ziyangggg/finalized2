@@ -1,9 +1,37 @@
 <?php
-$serverName = "localhost"; // or "localhost\\SQLEXPRESS"
+$serverName = "localhost";
+
+// You must store role in the session at login
+$role = $_SESSION['role'] ?? null;
+
+switch ($role) {
+    case 'admin':
+        $user = 'sql_admin';
+        $pass = 'admin';
+        break;
+    case 'company':
+        $user = 'sql_user';
+        $pass = 'user';
+        break;
+    case 'jobseeker':
+        $user = 'sql_jobseeker';
+        $pass = 'jobseeker';
+        break;
+    case 'public':   // Add this if you have a 'public' role explicitly set
+        $user = 'sql_public';
+        $pass = 'public';  // replace with actual password
+        break;
+    default:
+        // For users with no role, treat as public access
+        $user = 'sql_public';
+        $pass = 'public';  // replace with actual password
+        break;
+}
+
 $connectionOptions = array(
     "Database" => "finalyearproject",
-    "Uid" => "superadmin",          // use the login you just created
-    "PWD" => "1234",      // password for that login
+    "Uid" => $user,
+    "PWD" => $pass,
     "CharacterSet" => "UTF-8"
 );
 
