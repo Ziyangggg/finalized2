@@ -201,27 +201,34 @@ $row=sqlsrv_fetch_array($query);
 </html>
 
 <?php
-  //$jobseekerid = $_SESSION["jobseekerid"];加在"select * from job_seekerinfo where Job_SeekerID = jobseekerid";
-  //不明白就看回去companyprofile那边
 	include("connect.php");
 	
   $query=sqlsrv_query($connect,"SELECT * FROM finalyearproject.job_seekerinfo where Job_SeekerID='$jobseekerid'")or die(sqlsrv_errors());
   $row=sqlsrv_fetch_array($query);
 	if(isset($_POST["submit"]))
 	{
-		$name = $_POST["fullname"];
-		$username = $_POST["username"];
-		$password = $_POST["password"];
-		$email = $_POST["email"];
-    $phonenumber = $_POST["phone"];
-    $address = $_POST["address"];
-		
-		$query = "UPDATE finalyearproject.job_seekerinfo SET Job_SeekerFullname='$name',Job_SeekerUsername='$username',Job_SeekerPassword='$password',Job_SeekerEmail='$email',Job_SeekerPhone='$phonenumber',Job_SeekerAddress='$address' WHERE Job_SeekerID =$jobseekerid";
-		$result = sqlsrv_query($connect,$query) or die(sqlsrv_errors($connect));
-		
+		$name = trim($_POST["fullname"]);
+		$username = trim($_POST["username"]);
+		$password = trim($_POST["password"]);
+		$email = trim($_POST["email"]);
+    $phonenumber = trim($_POST["phone"]);
+    $address = trim($_POST["address"]);
 
-	
-	
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+			exit("Invalid email address.");
+		}
+
+    // Hash the password securely before storing
+    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+		
+		$query = "UPDATE finalyearproject.job_seekerinfoSET Job_SeekerFullname = ?, Job_SeekerUsername = ?, Job_SeekerPassword = ?, Job_SeekerEmail = ?, Job_SeekerPhone = ?, Job_SeekerAddress = ? WHERE Job_SeekerID = ?";
+		$params = [$name, $username, $password, $email, $phonenumber, $address, $jobseekerid];
+    $result = sqlsrv_query($connect,$query, $params) or die(sqlsrv_errors($connect));
+		
+    if ($result === false) {
+			error_log(print_r(sqlsrv_errors(), true)); // Log the error internally
+			exit("Database error."); // Generic error to user
+		}
 	?>
 	
 	<script>

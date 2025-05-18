@@ -123,21 +123,28 @@ $row38=sqlsrv_fetch_array($query);
 											<div class="left">
 												<?php
 												$sql = "SELECT * FROM finalyearproject.joblisting WHERE is_deleted='0' ";
-												if(isset($_GET['search'])) {
+
+												$params = [];
+												if (isset($_GET['search'])) {
 													$search = $_GET['search'];
-													$sql .= " AND JobTitle LIKE '%$search%' AND is_deleted='0' OR JobType LIKE '%$search%' AND is_deleted='0' ";
-													$sql .= " OR JobLocation LIKE '%$search%' AND is_deleted='0' ";
+													if (strlen($search) > 100) {
+														$search = trim($search);
+													}
+													$sql .= " AND (JobTitle LIKE ? OR JobType LIKE ? OR JobLocation LIKE ?) AND is_deleted='0' ";
+													$likeSearch = "%$search%";
+													$params = [$likeSearch, $likeSearch, $likeSearch];
 												}
-												$result = sqlsrv_query($connect, $sql);
-												
-												while($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC))
-												{
-												$eee = $row['JobListingID'];
-												$new = $row['CompanyID']; 
-												$sql2 = "select * from finalyearproject.company_info WHERE CompanyID = '$new' AND is_deleted='0'";
-												$result2 = sqlsrv_query($connect,$sql2);
-												$row2 = sqlsrv_fetch_array($result2, SQLSRV_FETCH_ASSOC);
-												if(is_array($row2)){ 
+
+												$result = sqlsrv_query($connect, $sql, $params);
+
+												while ($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC)) {
+													$eee = $row['JobListingID'];
+													$new = $row['CompanyID'];
+													$sql2 = "SELECT * FROM finalyearproject.company_info WHERE CompanyID = ? AND is_deleted='0'";
+													$params2 = [$new];
+													$result2 = sqlsrv_query($connect, $sql2, $params2);
+													$row2 = sqlsrv_fetch_array($result2, SQLSRV_FETCH_ASSOC);
+													if (is_array($row2)) {
 												?>
 												<div class="job-card">
 													<div class="img">
@@ -182,79 +189,108 @@ $row38=sqlsrv_fetch_array($query);
 			
 </body>
 </html>
-<?php								
-	if(isset($_GET['apply']))
-	{	
-		
-		date_default_timezone_set("Asia/Kuala_Lumpur");
-		$date=date('d/m/Y H:i:s');
-		$jid=$_GET['jid'];
-		$cid=$_GET['cid'];
-		$jobseekerid = $_SESSION["jobseekerid"];	
-
-		$sql66 = "SELECT * FROM finalyearproject.resume_jobseeker WHERE Job_SeekerID = '$jobseekerid'";
-		$result666 = sqlsrv_query($connect, $sql66);
-		$row6 = sqlsrv_fetch_array($result666, SQLSRV_FETCH_ASSOC);
-		if(is_array($row6)){ 
-			
-			$sql5 = "SELECT * from finalyearproject.application WHERE CompanyID = '$cid' AND Job_SeekerID = '$jobseekerid' AND JobListingID = '$jid'";
-			$result5 = sqlsrv_query($connect,$sql5);
-			$row8 = sqlsrv_fetch_array($result5, SQLSRV_FETCH_ASSOC);
-			if(is_array($row8)){ 
-			echo "<script type='text/javascript'>
-			window.location.href='JobSeekerJobListing.php';
-				alert('You Had Applied for this job!');
-			</script>";
-			}
-		else{
-		
-		$query = "INSERT INTO finalyearproject.application(DateApplied,ApplicationStatus,Job_SeekerID,CompanyID,JobListingID)
-		VALUES('$date','In Progress','$jobseekerid','$cid','$jid')";
-		$result = sqlsrv_query($connect,$query);
-?>
-		<script type='text/javascript'>
-			window.location.href="JobSeekerJobListing.php";alert("Apply Done!");
-		</script>
-		<?php
-				
+<?php
+if (!isset($_SESSION["jobseekerid"])) {
+    exit("Unauthorized access");
 }
-}else{
-	echo "<script type='text/javascript'> 
-			window.location.href='JobSeekerJobListing.php';
-					alert('Please Build Up Your CV First');
-			</script>";
-}
-	}
-			
-		if(isset($_GET['favourite']))
-		{
-			date_default_timezone_set("Asia/Kuala_Lumpur");
-			$date=date('d/m/Y H:i:s');
-			$jid=$_GET['jid'];
-			$cid=$_GET['cid'];
-			$jobseekerid = $_SESSION["jobseekerid"];
 
-			$sql9 = "SELECT * from finalyearproject.favourite WHERE Job_SeekerID = '$jobseekerid' AND JobListingID = '$jid'";
-			$result6 = sqlsrv_query($connect,$sql9);
-			$row7 = sqlsrv_fetch_array($result6, SQLSRV_FETCH_ASSOC);
-			if(is_array($row7)){ 
-			echo "<script type='text/javascript'>
-			window.location.href='JobSeekerJobListing.php';
-				alert('You Had Added This Job To Favourite!');
-			</script>";
-			}
-			else{			
-				$query0 = "INSERT INTO finalyearproject.favourite(Job_SeekerID,JobListingID)
-				VALUES('$jobseekerid','$jid')";
-				$result0 = sqlsrv_query($connect,$query0);
-		?>
-				<script type='text/javascript'>
-					window.location.href="JobSeekerJobListing.php";
-					alert("Add To Favourite Done!");
-				</script>
-				<?php
-			}
-		}		
+$date = date('Y-m-d H:i:s'); // ISO format better for DB
+
+// Validate function to ensure integer inputs
+function validate_int($value) {
+    return filter_var($value, FILTER_VALIDATE_INT);
+}
+
+if (isset($_GET['apply'])) {
+    $jid = validate_int($_GET['jid']);
+    $cid = validate_int($_GET['cid']);
+    $jobseekerid = $_SESSION["jobseekerid"];
+
+    if (!$jid || !$cid) {
+        exit("Invalid input");
+    }
+
+    // Check if resume exists
+    $sql66 = "SELECT * FROM finalyearproject.resume_jobseeker WHERE Job_SeekerID = ?";
+    $params66 = [$jobseekerid];
+    $result666 = sqlsrv_query($connect, $sql66, $params66);
+    if ($result666 === false) {
+        error_log(print_r(sqlsrv_errors(), true));
+        exit("Database error");
+    }
+    $row6 = sqlsrv_fetch_array($result666, SQLSRV_FETCH_ASSOC);
+
+    if (is_array($row6)) {
+        // Check if already applied
+        $sql5 = "SELECT * FROM finalyearproject.application WHERE CompanyID = ? AND Job_SeekerID = ? AND JobListingID = ?";
+        $params5 = [$cid, $jobseekerid, $jid];
+        $result5 = sqlsrv_query($connect, $sql5, $params5);
+        if ($result5 === false) {
+            error_log(print_r(sqlsrv_errors(), true));
+            exit("Database error");
+        }
+        $row8 = sqlsrv_fetch_array($result5, SQLSRV_FETCH_ASSOC);
+        if (is_array($row8)) {
+            echo "<script type='text/javascript'>
+                alert('You Had Applied for this job!');
+                window.location.href='JobSeekerJobListing.php';
+            </script>";
+        } else {
+            $query = "INSERT INTO finalyearproject.application(DateApplied, ApplicationStatus, Job_SeekerID, CompanyID, JobListingID) VALUES (?, 'In Progress', ?, ?, ?)";
+            $params = [$date, $jobseekerid, $cid, $jid];
+            $result = sqlsrv_query($connect, $query, $params);
+            if ($result === false) {
+                error_log(print_r(sqlsrv_errors(), true));
+                exit("Database error");
+            }
+            echo "<script type='text/javascript'>
+                alert('Apply Done!');
+                window.location.href='JobSeekerJobListing.php';
+            </script>";
+        }
+    } else {
+        echo "<script type='text/javascript'>
+            alert('Please Build Up Your CV First');
+            window.location.href='JobSeekerJobListing.php';
+        </script>";
+    }
+}
+
+if (isset($_GET['favourite'])) {
+    $jid = validate_int($_GET['jid']);
+    $jobseekerid = $_SESSION["jobseekerid"];
+
+    if (!$jid) {
+        exit("Invalid input");
+    }
+
+    $sql9 = "SELECT * FROM finalyearproject.favourite WHERE Job_SeekerID = ? AND JobListingID = ?";
+    $params9 = [$jobseekerid, $jid];
+    $result6 = sqlsrv_query($connect, $sql9, $params9);
+    if ($result6 === false) {
+        error_log(print_r(sqlsrv_errors(), true));
+        exit("Database error");
+    }
+    $row7 = sqlsrv_fetch_array($result6, SQLSRV_FETCH_ASSOC);
+    if (is_array($row7)) {
+        echo "<script type='text/javascript'>
+            alert('You Had Added This Job To Favourite!');
+            window.location.href='JobSeekerJobListing.php';
+        </script>";
+    } else {
+        $query0 = "INSERT INTO finalyearproject.favourite(Job_SeekerID, JobListingID) VALUES (?, ?)";
+        $params0 = [$jobseekerid, $jid];
+        $result0 = sqlsrv_query($connect, $query0, $params0);
+        if ($result0 === false) {
+            error_log(print_r(sqlsrv_errors(), true));
+            exit("Database error");
+        }
+        echo "<script type='text/javascript'>
+            alert('Add To Favourite Done!');
+            window.location.href='JobSeekerJobListing.php';
+        </script>";
+    }
+}
 ?>
 		
 		<script src="script.js"></script>

@@ -182,16 +182,25 @@ $row38=sqlsrv_fetch_array($query);
     date_default_timezone_set("Asia/Kuala_Lumpur");
 		$date=date('d/m/Y H:i:s');
 		
-		$fullname = $_POST["fullname"];
+		$fullname = trim($_POST["fullname"]);
+		$comments = trim($_POST["comments"]);
+		$score = filter_var($_POST["score"], FILTER_VALIDATE_INT);
+		$companyid = filter_var($_GET["789"], FILTER_VALIDATE_INT);
+		$jobseekerid = $_SESSION["jobseekerid"];
+
+		if (!$score || !$companyid || empty($comments)) {
+			exit("Invalid input");
+		}
 		
-		$comments = $_POST["comments"];
-    $score = $_POST["score"];
-    $jobseekerid = $_SESSION["jobseekerid"];
-    $companyid=$_GET["789"];
+		$query = "INSERT INTO finalyearproject.feedback(DateFeedback, FeedBackComments, FeedBackScore, Job_SeekerID, CompanyID) VALUES (?, ?, ?, ?, ?)";
+		$params = [$date, $comments, $score, $jobseekerid, $companyid];
+		$result = sqlsrv_query($connect,$query, $params);
+
+		if ($result === false) {
+			error_log(print_r(sqlsrv_errors(), true)); // Log the error internally
+			exit("Database error."); // Generic error to user
+		}
 		
-		$query = "INSERT INTO feedback(DateFeedback,FeedBackComments,FeedBackScore,Job_SeekerID,CompanyID)
-		VALUES('$date','$comments','$score','$jobseekerid','$companyid')";
-		$result = sqlsrv_query($connect,$query);
 		
 
 	sqlsrv_close($connect);
