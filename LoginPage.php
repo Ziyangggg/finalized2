@@ -81,7 +81,7 @@ function loginUser($user) {
             echo "<script>window.location.replace('CompanyDashboard.php');</script>";
             break;
         case "jobseeker":
-            echo "<script>window.location.replace('JobSeekerDashboard.php');</script>";
+            echo "<script>window.location.replace('JobSeekerResume.php');</script>";
             break;
         default:
             echo "<script>alert('Unknown user role.');</script>";
