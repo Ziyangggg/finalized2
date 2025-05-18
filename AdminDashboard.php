@@ -215,7 +215,7 @@ sqlsrv_free_stmt($stmt);
                                     $companyID = $row['CompanyID'];
 
                                     // Get company info
-                                    $sql2 = "SELECT * FROM company_info WHERE CompanyID = ? AND is_deleted = '0'";
+                                    $sql2 = "SELECT * FROM finalyearproject.company_info WHERE CompanyID = ? AND is_deleted = '0'";
                                     $params2 = array($companyID);
                                     $stmt2 = sqlsrv_query($connect, $sql2, $params2);
 
