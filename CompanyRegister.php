@@ -35,12 +35,14 @@
               
                 <div class="form-group">
                   <label>Company Name</label>
-                  <input name="companyname" placeholder="Enter your company name" type="text" class="form-control"  required>
+                  <!-- <input name="companyname" placeholder="Enter your company name" type="text" class="form-control" required> -->
+                  <input name="companyname" placeholder="Enter your company name" type="text" class="form-control" value="<?php echo isset($name) ? htmlspecialchars($name, ENT_QUOTES, 'UTF-8'):''; ?>" required>
                 </div>
 
                 <div class="form-group">
                     <label>Company Username</label>
-                    <input name="companyusername" placeholder="Enter your company username" type="text" class="form-control"  required>
+                    <!-- <input name="companyusername" placeholder="Enter your company username" type="text" class="form-control"  required> -->
+                    <input name="companyusername" placeholder="Enter your company username" type="text" class="form-control" value="<?php echo isset($username) ? htmlspecialchars($username, ENT_QUOTES, 'UTF-8'):''; ?>" required>
                   </div>
               </div>
 
@@ -53,7 +55,7 @@
               
                 <div class="form-group">
                   <label>Company Address</label>
-                  <input name="address" placeholder="Enter your company address" type="text" class="form-control"  required>
+                  <input name="address" placeholder="Enter your company address" type="text" class="form-control" value="<?php echo isset($address) ? htmlspecialchars($address, ENT_QUOTES, 'UTF-8'):''; ?>" required>
                 </div>
                 
               </div>
@@ -63,7 +65,7 @@
               
                 <div class="form-group">
                   <label>Registration Number</label>
-                  <input name="registrationnumber" placeholder="Enter your registration number" type="text" class="form-control"  required>
+                  <input name="registrationnumber" placeholder="Enter your registration number" type="text" class="form-control" value="<?php echo isset($registrationnumber) ? htmlspecialchars($registrationnumber, ENT_QUOTES, 'UTF-8'):''; ?>" required>
                 </div>
                 
               </div>
@@ -72,7 +74,7 @@
               
                 <div class="form-group">
                   <label>Industry</label>
-                   <input class="form-control" placeholder="Eg: Booking, Travel" name="industry" required type="text"  required> 
+                   <input class="form-control" placeholder="Eg: Booking, Travel" name="industry" required type="text" value="<?php echo isset($industry) ? htmlspecialchars($industry, ENT_QUOTES, 'UTF-8'):''; ?>" required> 
                 </div>
                 
               </div>
@@ -88,7 +90,7 @@
 
                 <div class="col-sm-6 col-md-4">
                   <label>Website</label>
-                  <input type="text" class="form-control"  name="website" placeholder="Enter your company website" >
+                  <input type="text" class="form-control"  name="website" placeholder="Enter your company website" value="<?php echo isset($website) ? htmlspecialchars($website, ENT_QUOTES, 'UTF-8'):''; ?>" >
                 </div>
                   
               </div>
@@ -101,7 +103,7 @@
               
                 <div class="form-group">
                   <label>Phone Number</label>
-                  <input type="tel" name="phone" pattern="[0-9]{10,11}" placeholder="Enter Phone Number Exp:0176899754"  class="form-control"  placeholder="Enter your company phone"required>
+                  <input type="tel" name="phone" pattern="[0-9]{10,11}" placeholder="Enter Phone Number Exp:0176899754"  class="form-control"  placeholder="Enter your company phone" value="<?php echo isset($phone) ? htmlspecialchars($phone, ENT_QUOTES, 'UTF-8'):''; ?>" required>
                 </div>
                 
               </div>
@@ -110,7 +112,7 @@
               
                 <div class="form-group">
                   <label>Email Address</label>
-                  <input type="email" name="email"  class="form-control"  placeholder="Enter your company email"required>
+                  <input type="email" name="email"  class="form-control"  placeholder="Enter your company email" value="<?php echo isset($email) ? htmlspecialchars($email, ENT_QUOTES, 'UTF-8'):''; ?>" required>
                 </div>
                 
               </div>
@@ -127,7 +129,7 @@
               
                 <div class="form-group bootstrap3-wysihtml5-wrapper">
                   <label>Company Description</label>
-                  <textarea name="description" class="bootstrap3-wysihtml5 form-control" placeholder="Enter your company description ..." style="height: 200px;"require></textarea>
+                  <textarea name="description" class="bootstrap3-wysihtml5 form-control" placeholder="Enter your company description ..." style="height: 200px;" require><?php echo isset($description) ? htmlspecialchars($description, ENT_QUOTES, 'UTF-8'):''; ?></textarea>
                 </div>
                 
               </div>
@@ -138,7 +140,7 @@
               
                 <div class="form-group bootstrap3-wysihtml5-wrapper">
                   <label>Company Our Team</label>
-                  <textarea name="team" class="bootstrap3-wysihtml5 form-control" placeholder="Enter your company services ..." style="height: 200px;"require></textarea>
+                  <textarea name="team" class="bootstrap3-wysihtml5 form-control" placeholder="Enter your company services ..." style="height: 200px;" required><?php echo isset($team) ? htmlspecialchars($team, ENT_QUOTES, 'UTF-8'):''; ?></textarea>
                 </div>
                 
               </div>
@@ -149,7 +151,7 @@
               
                 <div class="form-group bootstrap3-wysihtml5-wrapper">
                   <label>Company Our Mission</label>
-                  <textarea name="mission" class="bootstrap3-wysihtml5 form-control" placeholder="Enter your company expertises ..." style="height: 200px;" require></textarea>
+                  <textarea name="mission" class="bootstrap3-wysihtml5 form-control" placeholder="Enter your company expertises ..." style="height: 200px;" required><?php echo isset($mission) ? htmlspecialchars($mission, ENT_QUOTES, 'UTF-8'):''; ?></textarea>
                 </div>
                 
               </div>
@@ -158,7 +160,7 @@
               
                 <div class="form-group bootstrap3-wysihtml5-wrapper">
                   <label>Company Our Vision</label>
-                  <textarea name="vision" class="bootstrap3-wysihtml5 form-control" placeholder="Enter your company services ..." style="height: 200px;" require></textarea>
+                  <textarea name="vision" class="bootstrap3-wysihtml5 form-control" placeholder="Enter your company services ..." style="height: 200px;" required><?php echo isset($vision) ? htmlspecialchars($vision, ENT_QUOTES, 'UTF-8'):''; ?></textarea>
                 </div>
                 
               </div>
@@ -250,6 +252,18 @@
     $error = false;
     $errorMsg = "";
 
+    // check phone number format
+    if (!preg_match("/^[0-9]{8,15}$/", $phone)) {
+    $error = true;
+    $errorMsg = "Invalid phone number.";
+    }
+
+    // check email format
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    $error = true;
+    $errorMsg = "Invalid email format.";
+    }
+
     // Check if username already exists
     $checkUsername = "SELECT COUNT(*) as count FROM finalyearproject.company_info WHERE CompanyUsername = ?";
     $params = array($username);
@@ -277,13 +291,12 @@
         
         // Validate file size
         if ($fileSize > $maxFileSize) {
-            $_SESSION['error'] = "Error: File size exceeds 2MB. Please choose a smaller file.";
             $errorMsg = "Error: File size exceeds 2MB. Please choose a smaller file.";
             $error = true;
         }
         // Validate file type
         else if (!in_array(strtolower($fileType), $allowTypes)) {
-            $_SESSION['error'] = "Error: Only JPG, PNG & GIF files are allowed.";
+
             $errorMsg = "Error: Only JPG, PNG & GIF files are allowed.";
             $error = true;
         }
