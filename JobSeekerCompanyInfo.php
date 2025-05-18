@@ -109,7 +109,7 @@ $row38=sqlsrv_fetch_array($query);
       <div class="all-boxes">
         <?php
         $ggg=$_GET["456"];
-        $query = "select * from company_info WHERE CompanyID = $ggg and is_deleted = '0'";
+        $query = "select * from finalyearproject.company_info WHERE CompanyID = $ggg and is_deleted = '0'";
         $result = sqlsrv_query($connect,$query);      
         if($row = sqlsrv_fetch_array($result,SQLSRV_FETCH_ASSOC)){
           $new = $row['CompanyID']; 

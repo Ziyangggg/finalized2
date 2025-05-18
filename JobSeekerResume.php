@@ -277,29 +277,30 @@ $row38=sqlsrv_fetch_array($query);
 		$query = "DELETE FROM finalyearproject.resume_jobseeker WHERE Job_SeekerID=$jobseekerid";
 		$result = sqlsrv_query($connect, $query);
 		
-		$name = $_POST["name"];
-		$address = $_POST["address"];
-		$race = $_POST["race"];
-		$phonenumber = $_POST["phonenumber"];
-    	$emailaddress = $_POST["emailaddress"];
-    	$education = $_POST["education"];
-		$summary = $_POST["summary"];
-		$workexperience = $_POST["workexperience"];
-		$language = $_POST["language"];
-    	$skills = $_POST["skills"];
+		$name = trim($_POST["name"]);
+		$address = trim($_POST["address"]);
+		$race = trim($_POST["race"]);
+		$phonenumber = trim($_POST["phonenumber"]);
+		$emailaddress = trim($_POST["emailaddress"]);
+		$education = trim($_POST["education"]);
+		$summary = trim($_POST["summary"]);
+		$workexperience = trim($_POST["workexperience"]);
+		$language = trim($_POST["language"]);
+		$skills = trim($_POST["skills"]);
 		$jobseekerid = $_SESSION["jobseekerid"];
+
+		if (!filter_var($emailaddress, FILTER_VALIDATE_EMAIL)) {
+			exit("Invalid email address.");
+		}
 		
-		 $query = "INSERT INTO finalyearproject.resume_jobseeker(Job_SeekerFullname, Job_SeekerEmail, Job_SeekerPhone, Job_SeekerAddress, Job_SeekerRace, Job_SeekerExperience, Job_SeekerEducation, Job_SeekerLanguage, Job_SeekerSkill, Job_SeekerSummary,Job_SeekerID)
-		 VALUES ('$name', '$emailaddress', '$phonenumber', '$address', '$race', '$workexperience', '$education', '$language', '$skills', '$summary','$jobseekerid')";
-		 $result = sqlsrv_query($connect, $query);
+		$query = "INSERT INTO finalyearproject.resume_jobseeker (Job_SeekerFullname, Job_SeekerEmail, Job_SeekerPhone, Job_SeekerAddress, Job_SeekerRace, Job_SeekerExperience, Job_SeekerEducation, Job_SeekerLanguage, Job_SeekerSkill, Job_SeekerSummary, Job_SeekerID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		$params = [$name, $emailaddress, $phonenumber, $address, $race, $workexperience, $education, $language, $skills, $summary, $jobseekerid];
+		$result = sqlsrv_query($connect, $query, $params);
 
-		 //$query = "INSERT INTO resume_jobseeker(Job_SeekerFullname)
-		// VALUES('$name')";
-		 //$result = mysqli_query($connect,$query);
-
-		//$query = "INSERT INTO resume_jobseeker(Job_SeekerFullname)
-		//VALUES('$name')";
-		//$result = mysqli_query($connect, $query);
+		if ($result === false) {
+			error_log(print_r(sqlsrv_errors(), true)); // Don't show errors to users
+			exit("Database error.");
+		}
 
 		sqlsrv_close($connect);
 	

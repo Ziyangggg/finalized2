@@ -169,16 +169,24 @@ $row38=sqlsrv_fetch_array($query);
 	
 	if(isset($_POST["submit"]))
 	{
-		$name = $_POST["name"];
-		$email = $_POST["email"];
-		$message = $_POST["message"];
-    $jobseekerid = $_SESSION["jobseekerid"];
+		$name = trim($_POST["name"]);
+		$email = trim($_POST["email"]);
+		$message = trim($_POST["message"]);
+    	$jobseekerid = $_SESSION["jobseekerid"];
 
+		// Basic input validation
+		if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+			exit("Invalid email address.");
+		}
+
+		$query = "INSERT INTO finalyearproject.message (Name, Email, Message, Job_SeekerID) VALUES (?, ?, ?, ?)";
+		$params = [$name, $email, $message, $jobseekerid];
+		$result = sqlsrv_query($connect, $query, $params);
 		
-		$query = "INSERT INTO finalyearproject.message(Name,Email,Message,Job_SeekerID )
-		VALUES('$name','$email','$message','$jobseekerid')";
-		$result = sqlsrv_query($connect,$query);
-		
+		if ($result === false) {
+			error_log(print_r(sqlsrv_errors(), true)); // Log the error internally
+			exit("Database error."); // Generic error to user
+		}
 
 	sqlsrv_close($connect);
 	

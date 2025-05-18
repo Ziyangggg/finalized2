@@ -107,12 +107,21 @@ $row38=sqlsrv_fetch_array($query);
             $search = '';
             if (isset($_GET['search'])) {
             $search = $_GET['search'];
-            $query = "select * from finalyearproject.company_info where  CompanyUsername LIKE '%$search%' AND is_deleted='0' OR CompanyName LIKE '%$search%'  AND  is_deleted='0'";
-            } else {
-            $query = "SELECT * FROM finalyearproject.company_info WHERE is_deleted='0' ";
+			if (strlen($search) > 100) {
+					$search = trim($search);
+				}
+				$query = "SELECT * FROM finalyearproject.company_info WHERE (CompanyUsername LIKE ? OR CompanyName LIKE ?) AND is_deleted='0'";
+				$likeSearch = "%$search%";
+    			$params = [$likeSearch, $likeSearch];
+				} else {
+				$query = "SELECT * FROM finalyearproject.company_info WHERE is_deleted='0' ";
             }
 
 $result = sqlsrv_query($connect, $query);
+if ($result === false) {
+    error_log(print_r(sqlsrv_errors(), true));
+    exit("Database error");
+}
 ?>
     
     <div class="profile-details">
