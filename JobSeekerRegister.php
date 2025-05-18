@@ -68,56 +68,30 @@
 </html>
 
 <?php
-include("connect.php");
-
-if (isset($_POST["submit"])) {
-    $name = $_POST["fullname"];
-    $username = $_POST["username"];
-    $password = $_POST["password"];
-    $email = $_POST["email"];
+	include("connect.php");
+	
+	if(isset($_POST["submit"]))
+	{
+		$name = $_POST["fullname"];
+		$username = $_POST["username"];
+		$password = $_POST["password"];
+		$email = $_POST["email"];
     $phonenumber = $_POST["phone"];
     $address = $_POST["address"];
+		
+		$query = "INSERT INTO job_seekerinfo(Job_SeekerFullname,Job_SeekerUsername,Job_SeekerPassword,Job_SeekerEmail,Job_SeekerPhone,Job_SeekerAddress,is_deleted)
+		VALUES('$name','$username','$password','$email','$phonenumber','$address','0')";
+		$result = mysqli_query($connect,$query);
+		
 
-    // Check for duplicate username
-    $checkUserSQL = "SELECT COUNT(*) AS cnt FROM finalyearproject.users WHERE Username = ?";
-    $checkUserStmt = sqlsrv_query($connect, $checkUserSQL, array($username));
-
-    if ($checkUserStmt === false) {
-        die(print_r(sqlsrv_errors(), true));
-    }
-
-    $count = 0;
-    if ($row = sqlsrv_fetch_array($checkUserStmt, SQLSRV_FETCH_ASSOC)) {
-        $count = (int)$row['cnt'];
-    }
-
-    if ($count > 0) {
-        echo "<script>alert('Username already exists. Please choose another username.'); window.location.href = 'JobSeekerRegister.php';</script>";
-        exit;
-    }
-
-    // Hash the password
-    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
-    // Insert into users table
-    $userInsertSQL = "INSERT INTO finalyearproject.users 
-        (FullName, Username, UserPassword, UserEmail, UserPhone, UserAddress, Role, is_deleted, CreatedAt)
-        VALUES (?, ?, ?, ?, ?, ?, 'jobseeker', 0, GETDATE())";
-
-    $userParams = array($name, $username, $hashedPassword, $email, $phonenumber, $address);
-    $userStmt = sqlsrv_query($connect, $userInsertSQL, $userParams);
-
-    if ($userStmt === false) {
-        die(print_r(sqlsrv_errors(), true));
-    }
-
-    sqlsrv_free_stmt($userStmt);
-    sqlsrv_close($connect);
-    ?>
-    <script>
-        alert("Job Seeker Registered Successfully!");
-        window.location.href = "JobSeekerLogin.php";
-    </script>
-<?php
-}
-?>
+	mysqli_close($connect);
+	
+	?>
+	
+	<script>
+		alert("Sign Up Done!");
+    window.location.href="JobSeekerLogin.php";
+	</script>
+	
+	<?php
+	}
