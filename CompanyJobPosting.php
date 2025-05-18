@@ -126,11 +126,10 @@ $row49 = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
             <tr>
                           <?php
                           $companyid = $_SESSION["companyid"];
-                          $sql = "SELECT * FROM finalyearproject.joblisting WHERE CompanyID = $companyid and is_deleted='0' Order By JobListingID DESC";
+                          $sql = "SELECT * FROM finalyearproject.joblisting WHERE CompanyID = ? and is_deleted='0' Order By JobListingID DESC";
                           $params = array($companyid);
                           $result = sqlsrv_query($connect, $sql, $params);
-                          
-                          
+
                           $sql3 = "SELECT * FROM finalyearproject.company_info WHERE CompanyID = ? AND is_deleted = '0'";
                           $params3 = array($companyid);
                           $result3 = sqlsrv_query($connect, $sql3, $params3);
@@ -209,16 +208,16 @@ $row49 = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
                                         
                                         <div class="company-detail-wrapper">
     
-                                              <input type="hidden"  name="jobid" value="<?php echo $row['JobListingID'] ?>">
+                                              <input type="hidden"  name="jobid" value="<?php echo htmlspecialchars(trim($row['JobListingID']), ENT_QUOTES, 'UTF-8'); ?>">
 
                                             <div class="form-group">
                                                 <label>Job Title</label>
-                                                <input name="title" required type="text" class="form-control" placeholder="Enter job title" value="<?php echo $row['JobTitle'] ?>">
+                                                <input name="title" required type="text" class="form-control" placeholder="Enter job title" value="<?php echo htmlspecialchars(trim($row['JobTitle']), ENT_QUOTES, 'UTF-8'); ?>">
                                             </div>
 
                                             <div class="form-group">
                                                 <label>Location</label>
-                                                <input name="location" required type="text" class="form-control" placeholder="Enter Location" value="<?php echo $row['JobLocation'] ?>">
+                                                <input name="location" required type="text" class="form-control" placeholder="Enter Location" value="<?php echo htmlspecialchars(trim($row['JobLocation']), ENT_QUOTES, 'UTF-8'); ?>">
                                             </div>
 
                                            
@@ -229,7 +228,7 @@ $row49 = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
                                                   <select name="category"  >
                                                     <option disabled value="">Select</option>
                                                     <?php
-                                                    $sql11 = "select * from finalyearproject.jobcategory where is_deleted = '0'";
+                                                    $sql11 = "SELECT * FROM finalyearproject.jobcategory where is_deleted = '0'";
                                                     $result22 = sqlsrv_query($connect, $sql11);
                                                     while ($row33 = sqlsrv_fetch_array($result22, SQLSRV_FETCH_ASSOC))
                                                     {
@@ -245,7 +244,7 @@ $row49 = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
                                             <div class="form-group">
                                             
                                                 <label>Salary</label>
-                                                <input name="salary" required type="number" class="form-control" placeholder="Eg: 2000" value="<?php echo $row['JobSalary'] ?>">
+                                                <input name="salary" required type="number" class="form-control" placeholder="Eg: 2000" value="<?php echo htmlspecialchars(trim($row['JobSalary']), ENT_QUOTES, 'UTF-8'); ?>">
                                             </div>
 
                                         
@@ -261,7 +260,7 @@ $row49 = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
 
                                             <div class="form-group bootstrap3-wysihtml5-wrapper">
                                                 <label>Job Description</label>
-                                                <textarea class="form-control bootstrap3-wysihtml5" name="description" required placeholder="Enter description ..." style="height: 200px;" ><?php echo $row['JobDescription'] ?></textarea>
+                                                <textarea class="form-control bootstrap3-wysihtml5" name="description" required placeholder="Enter description ..." style="height: 200px;" ><?php echo htmlspecialchars(trim($row['JobDescription']), ENT_QUOTES, 'UTF-8'); ?></textarea>
                                             </div>
                                             
 
@@ -270,7 +269,7 @@ $row49 = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
                                         
                                             <div class="form-group bootstrap3-wysihtml5-wrapper">
                                                 <label>Requirements</label>
-                                                <textarea name="requirements" required class="form-control bootstrap3-wysihtml5" placeholder="Enter requirements..." style="height: 200px;" ><?php echo $row['JobRequirement'] ?></textarea>
+                                                <textarea name="requirements" required class="form-control bootstrap3-wysihtml5" placeholder="Enter requirements..." style="height: 200px;" ><?php echo htmlspecialchars(trim($row['JobRequirement']), ENT_QUOTES, 'UTF-8'); ?></textarea>
                                             </div>
                                            
                                             
@@ -340,20 +339,19 @@ function confirmation()
 		}
 
     if(isset($_POST['submit']))
-    
   { 
-    $jobid = $_POST["jobid"];
-    $title = $_POST["title"];
-		$location = $_POST["location"];
+    $jobid = trim($_POST["jobid"]);
+    $title = trim($_POST["title"]);
+		$location = trim($_POST["location"]);
 		$category = $_POST["category"];
-		$salary = $_POST["salary"];
+		$salary = trim($_POST["salary"]);
     $jobtype = $_POST["jobtype"];
-    $description = $_POST["description"];
-    $requirements = $_POST["requirements"];
+    $description = trim($_POST["description"]);
+    $requirements = trim($_POST["requirements"]);
     $companyid = $_SESSION["companyid"];
     $jobcategoryid = $_POST["category"];
     
-    $query = "UPDATE finalyearproject.joblisting SET JobTitle = '$title' ,JobDescription = '$description' ,JobSalary = '$salary' ,JobRequirement = '$requirements' ,JobType = '$jobtype' ,JobLocation = '$location'  ,JobCategoryID = '$jobcategoryid'   WHERE JobListingID =$jobid";
+    $query = "UPDATE finalyearproject.joblisting SET JobTitle = ?, JobDescription = ?, JobSalary = ?, JobRequirement = ?, JobType = ?, JobLocation = ?, JobCategoryID = ? WHERE JobListingID = ?";
     $params = array($title, $description, $salary, $requirements, $jobtype, $location, $jobcategoryid, $jobid);
     $result = sqlsrv_query($connect, $query, $params);
 
