@@ -129,8 +129,7 @@ sqlsrv_free_stmt($stmt);
     </div>
     
     <div class="profile-details">
-      <span class="admin_name"><?php echo $row49["AdminUsername"] ?></span>
-      
+      <span class="admin_name"><?php echo $_SESSION["fullname"]; ?></span>
     </div>
   </nav>
 
@@ -209,10 +208,10 @@ sqlsrv_free_stmt($stmt);
             <tr>
               
                           <?php
-                            $username = $_SESSION["adminusername"]; // show admin name
+                            $username = $_SESSION["fullname"]; // show admin name
 
                             // Get latest 10 job listings (SQL Server doesn't support LIMIT — use TOP)
-                            $sql = "SELECT TOP 10 * FROM finalyearproject.joblisting WHERE is_deleted = '0' ORDER BY JobListingID DESC";
+                            $sql = "SELECT TOP 10 * FROM finalyearproject.joblisting WHERE is_deleted = 0 ORDER BY JobListingID DESC";
                             $stmt = sqlsrv_query($connect, $sql);
 
                             if ($stmt) {
@@ -220,7 +219,7 @@ sqlsrv_free_stmt($stmt);
                                     $companyID = $row['CompanyID'];
 
                                     // Get company info
-                                    $sql2 = "SELECT * FROM company_info WHERE CompanyID = ? AND is_deleted = '0'";
+                                    $sql2 = "SELECT * FROM finalyearproject.company_info WHERE CompanyID = ? AND is_deleted = 0";
                                     $params2 = array($companyID);
                                     $stmt2 = sqlsrv_query($connect, $sql2, $params2);
 
@@ -228,7 +227,7 @@ sqlsrv_free_stmt($stmt);
                             ?>
                                     <tr>
                                         <td><?php echo $row['JobListingID']; ?></td>
-                                        <td><?php echo $row['JobTitle']; ?></td>
+                                        <td><?php echo $row['JobTitle']; ?></td> 
                                         <td><?php echo $row['JobCategoryID']; ?></td>
                                         <td><?php echo $row['JobSalary']; ?></td>
                                         <td><?php echo $row2['CompanyName']; ?></td>

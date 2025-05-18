@@ -2,7 +2,7 @@
 <?php
 require_once('connect.php'); // Make sure this uses sqlsrv_connect()
 
-$id = $_SESSION["adminid"];
+$id = $_SESSION["userid"];
 
 $sql = "SELECT * FROM finalyearproject.admin_info WHERE AdminID = ?";
 $params = array($id);
@@ -126,7 +126,7 @@ $row49 = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
     </div>
     
     <div class="profile-details">
-    <span class="admin_name"><?php echo $row49["AdminUsername"] ?></span>
+    <span class="admin_name"><?php echo $_SESSION["fullname"] ?></span>
       
     </div>
   </nav>
@@ -159,7 +159,7 @@ $row49 = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
             </thead>
             <tbody>
             <?php
-              $username = $_SESSION["adminusername"]; // show admin name
+              $username = $_SESSION["fullname"]; // show admin name
 
               $sql = "SELECT * FROM finalyearproject.report ORDER BY ReportID DESC";
               $stmt = sqlsrv_query($connect, $sql);

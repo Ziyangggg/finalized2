@@ -4,7 +4,7 @@
 require_once('connect.php');
 
 // Get admin ID from session
-$id = $_SESSION["adminid"];
+$id = $_SESSION["userid"];
 
 // Prepare the first query (get admin info)
 $query1 = "SELECT * FROM finalyearproject.admin_info WHERE AdminID = ?";
@@ -130,7 +130,7 @@ if ($stmt2 === false) {
     </div>
     
     <div class="profile-details">
-    <span class="admin_name"><?php echo $row49["AdminUsername"] ?></span>
+    <span class="admin_name"><?php echo $_SESSION["fullname"] ?></span>
       
     </div>
   </nav>
@@ -157,7 +157,7 @@ if ($stmt2 === false) {
           <tbody>
           <tr>
           <?php
-          $username = $_SESSION["adminusername"]; // show admin name
+          $username = $_SESSION["fullname"]; // show admin name
 
           while ($row = sqlsrv_fetch_array($stmt2, SQLSRV_FETCH_ASSOC)) {
           ?>

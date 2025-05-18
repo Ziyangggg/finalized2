@@ -60,38 +60,45 @@ session_start();
 include("connect.php");
 
 function loginUser($user) {
-        session_start();
-        $_SESSION["userid"] = $user["UserID"];
-        $_SESSION["username"] = $user["Username"];
-        $_SESSION["role"] = $user["Role"];
-        
-        echo "Logged in as " . $_SESSION["username"] . " with role " . $_SESSION["role"] . "<br>";
-        
-        switch ($user["Role"]) {
-            case "admin":
-                echo "<script>window.location.replace('AdminDashboard.php');</script>";
-                break;
-            case "company":
-                echo "<script>window.location.replace('CompanyDashboard.php');</script>";
-                break;
-            case "jobseeker":
-                echo "<script>window.location.replace('JobSeekerDashboard.php');</script>";
-                break;
-            default:
-                echo "<script>alert('Unknown user role.');</script>";
-        }
-        exit;
+    global $connect; // allow access to DB connection
+
+    session_regenerate_id(true);
+
+    $_SESSION["userid"] = $user["UserID"];
+    $_SESSION["username"] = $user["Username"];
+    $_SESSION["role"] = $user["Role"];
+    $_SESSION["fullname"] = $user["FullName"];
+
+    $userid = $user["UserID"];
+    $role = $user["Role"];
+
+    // Redirect based on role
+    switch ($role) {
+        case "admin":
+            echo "<script>window.location.replace('AdminDashboard.php');</script>";
+            break;
+        case "company":
+            echo "<script>window.location.replace('CompanyDashboard.php');</script>";
+            break;
+        case "jobseeker":
+            echo "<script>window.location.replace('JobSeekerDashboard.php');</script>";
+            break;
+        default:
+            echo "<script>alert('Unknown user role.');</script>";
     }
+
+    exit;
+}
+
 
 if (isset($_POST["submit"])) {
     $username = $_POST["username"];
     $password = $_POST["password"];
 
-    // Step 1: Get user by username only
     $query = "SELECT * FROM finalyearproject.users WHERE Username = ? AND is_deleted = 0";
     $params = array($username);
-
     $stmt = sqlsrv_query($connect, $query, $params);
+
     if ($stmt === false) {
         die(print_r(sqlsrv_errors(), true));
     }
@@ -99,25 +106,22 @@ if (isset($_POST["submit"])) {
     $user = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
 
     if ($user) {
-        $storedPassword = $user["Password"];
+        $storedPassword = $user["UserPassword"]; // this is hashed
         $userid = $user["UserID"];
         $role = $user["Role"];
 
-        echo "User found: $userid, role: $role<br>";
-        echo "Entered password: $password<br>";
-        echo "Stored password: $storedPassword<br>";
-
-        // Plaintext comparison only
-        if ($password === $storedPassword) {
-            echo "Plaintext password matched<br>";
-            loginUser($user);
+        // Secure password verification
+        if (password_verify($password, $storedPassword)) {
+            // Successful login
+            loginUser($user); // You must define this function based on your session or redirect logic
         } else {
-            echo "Password mismatch<br>";
             echo "<script>alert('Login failed. Invalid credentials.');</script>";
         }
     } else {
-        echo "User not found<br>";
         echo "<script>alert('Login failed. Invalid credentials.');</script>";
     }
+
+    sqlsrv_free_stmt($stmt);
+    sqlsrv_close($connect);
 }
 ?>
