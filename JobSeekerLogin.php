@@ -74,9 +74,17 @@
 	//$username = mysqli_real_escape_string($connect,$username);
 	//$password = mysqli_real_escape_string($connect,$password);
 	
-	$query = "SELECT * FROM job_seekerinfo where Job_SeekerUsername = '$username' and Job_SeekerPassword = '$password' and is_deleted = '0'";
-	$result = mysqli_query($connect,$query);
-	$row = mysqli_fetch_array($result);
+	$query = "SELECT * FROM finalyearproject.job_seekerinfo WHERE Job_SeekerUsername = ? AND Job_SeekerPassword = ? AND is_deleted = 0";
+  $params = array($username, $password);
+
+  $result = sqlsrv_query($connect, $query, $params);
+
+  // Check if query failed
+  if ($result === false) {
+      die(print_r(sqlsrv_errors(), true));  // Show the SQL Server error
+  }
+
+$row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC);
 	//$count = mysqli_num_rows($result);
 	
 	if(is_array($row))
@@ -87,8 +95,8 @@
     $jobseekerid= $row["Job_SeekerID"];
     
     $sql66 = "SELECT * FROM resume_jobseeker WHERE Job_SeekerID = '$jobseekerid'";
-		$result666 = mysqli_query($connect, $sql66);
-		$row6 = mysqli_fetch_assoc($result666);
+		$result666 = sqlsrv_query($connect, $sql66);
+		$row6 = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC);
 		if(!is_array($row6)){ 
       echo"<script>
       alert('Pls create your resume in order to apply jobs :)');
@@ -109,7 +117,7 @@
     </script>";
 	}
 }
-mysqli_close($connect);
+sqlsrv_close($connect);
 ?>
 
 

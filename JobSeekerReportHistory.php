@@ -1,8 +1,8 @@
 <?php
 include("Jobseeker_session.php");
 require_once('connect.php');
-$query=mysqli_query($connect,"SELECT * FROM job_seekerinfo where Job_SeekerID='$jobseekerid' ")or die(mysqli_error());
-$row38=mysqli_fetch_array($query);
+$query=sqlsrv_query($connect,"SELECT * FROM finalyearproject.job_seekerinfo where Job_SeekerID='$jobseekerid' ")or die(sqlsrv_errors());
+$row38=sqlsrv_fetch_array($query);
 ?>
 
 <!DOCTYPE html>
@@ -129,20 +129,20 @@ $row38=mysqli_fetch_array($query);
 								<tbody>
 									<?php
 										$jobseekerid = $_SESSION["jobseekerid"];
-										$query = "select * from report WHERE Job_SeekerID = $jobseekerid order by ReportID DESC";
-										$result = mysqli_query($connect,$query);
-										while($row = mysqli_fetch_assoc($result))
+										$query = "select * from finalyearproject.report WHERE Job_SeekerID = $jobseekerid order by ReportID DESC";
+										$result = sqlsrv_query($connect,$query);
+										while($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC))
 										{
 											$new = $row['JobListingID']; 
-											$sql2 = "select * from joblisting WHERE JobListingID = '$new' and is_deleted = '0'";
-											$result2 = mysqli_query($connect,$sql2);
-											$row2 = mysqli_fetch_assoc($result2);
+											$sql2 = "select * from finalyearproject.joblisting WHERE JobListingID = '$new' and is_deleted = '0'";
+											$result2 = sqlsrv_query($connect,$sql2);
+											$row2 = sqlsrv_fetch_array($result2, SQLSRV_FETCH_ASSOC);
 											if(is_array($row2)){
 
 											$new3 = $row2['CompanyID']; 
-											$sql4 = "select * from company_info WHERE CompanyID = '$new3'and is_deleted = '0'";
-											$result4 = mysqli_query($connect,$sql4);
-											$row4 = mysqli_fetch_assoc($result4);
+											$sql4 = "select * from finalyearproject.company_info WHERE CompanyID = '$new3'and is_deleted = '0'";
+											$result4 = sqlsrv_query($connect,$sql4);
+											$row4 = sqlsrv_fetch_array($result4, SQLSRV_FETCH_ASSOC);
 											if(is_array($row4)){
 									?>
 								<tr>

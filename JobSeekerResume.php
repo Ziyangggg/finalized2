@@ -1,11 +1,11 @@
 <?php
 include("Jobseeker_session.php");
 require_once('connect.php');
-$query=mysqli_query($connect,"SELECT * FROM resume_jobseeker where Job_SeekerID='$jobseekerid' ")or die(mysqli_error());
-$row=mysqli_fetch_array($query);
+$query=sqlsrv_query($connect,"SELECT * FROM finalyearproject.resume_jobseeker where Job_SeekerID='$jobseekerid' ")or die(sqlsrv_errors());
+$row=sqlsrv_fetch_array($query);
 
-$query=mysqli_query($connect,"SELECT * FROM job_seekerinfo where Job_SeekerID='$jobseekerid' ")or die(mysqli_error());
-$row38=mysqli_fetch_array($query);
+$query=sqlsrv_query($connect,"SELECT * FROM finalyearproject.job_seekerinfo where Job_SeekerID='$jobseekerid' ")or die(sqlsrv_errors());
+$row38=sqlsrv_fetch_array($query);
 ?>
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
@@ -274,8 +274,8 @@ $row38=mysqli_fetch_array($query);
 	
 	if(isset($_POST["submit"]))
 	{ 	
-		$query = "DELETE FROM resume_jobseeker WHERE Job_SeekerID=$jobseekerid";
-		$result = mysqli_query($connect, $query);
+		$query = "DELETE FROM finalyearproject.resume_jobseeker WHERE Job_SeekerID=$jobseekerid";
+		$result = sqlsrv_query($connect, $query);
 		
 		$name = $_POST["name"];
 		$address = $_POST["address"];
@@ -289,9 +289,9 @@ $row38=mysqli_fetch_array($query);
     	$skills = $_POST["skills"];
 		$jobseekerid = $_SESSION["jobseekerid"];
 		
-		 $query = "INSERT INTO resume_jobseeker(Job_SeekerFullname, Job_SeekerEmail, Job_SeekerPhone, Job_SeekerAddress, Job_SeekerRace, Job_SeekerExperience, Job_SeekerEducation, Job_SeekerLanguage, Job_SeekerSkill, Job_SeekerSummary,Job_SeekerID)
+		 $query = "INSERT INTO finalyearproject.resume_jobseeker(Job_SeekerFullname, Job_SeekerEmail, Job_SeekerPhone, Job_SeekerAddress, Job_SeekerRace, Job_SeekerExperience, Job_SeekerEducation, Job_SeekerLanguage, Job_SeekerSkill, Job_SeekerSummary,Job_SeekerID)
 		 VALUES ('$name', '$emailaddress', '$phonenumber', '$address', '$race', '$workexperience', '$education', '$language', '$skills', '$summary','$jobseekerid')";
-		 $result = mysqli_query($connect, $query);
+		 $result = sqlsrv_query($connect, $query);
 
 		 //$query = "INSERT INTO resume_jobseeker(Job_SeekerFullname)
 		// VALUES('$name')";
@@ -301,7 +301,7 @@ $row38=mysqli_fetch_array($query);
 		//VALUES('$name')";
 		//$result = mysqli_query($connect, $query);
 
-		mysqli_close($connect);
+		sqlsrv_close($connect);
 	
 	?>
 	

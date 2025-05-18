@@ -1,8 +1,8 @@
 <?php
 require_once('connect.php');
 include('Jobseeker_session.php');
-$query=mysqli_query($connect,"SELECT * FROM job_seekerinfo where Job_SeekerID='$jobseekerid' ")or die(mysqli_error());
-$row38=mysqli_fetch_array($query);
+$query=sqlsrv_query($connect,"SELECT * FROM finalyearproject.job_seekerinfo where Job_SeekerID='$jobseekerid' ")or die(sqlsrv_errors());
+$row38=sqlsrv_fetch_array($query);
 ?>
 
 <!DOCTYPE html>
@@ -146,45 +146,45 @@ $row38=mysqli_fetch_array($query);
                       $jobseekerid = $_SESSION["jobseekerid"];
                       if(isset($_GET['all']))
                       {
-                        $sql = "select * from application WHERE Job_SeekerID = '$jobseekerid'ORDER BY ApplicationID DESC";
+                        $sql = "select * from finalyearproject.application WHERE Job_SeekerID = '$jobseekerid'ORDER BY ApplicationID DESC";
                         }
                         else if(isset($_GET['inprocess'])){
-                          $sql = "select * from application WHERE Job_SeekerID = '$jobseekerid' AND ApplicationStatus = 'In Progress' ORDER BY ApplicationID DESC";
+                          $sql = "select * from finalyearproject.application WHERE Job_SeekerID = '$jobseekerid' AND ApplicationStatus = 'In Progress' ORDER BY ApplicationID DESC";
                         }
                         else if(isset($_GET['accepted'])){
-                          $sql = "select * from application WHERE Job_SeekerID = '$jobseekerid' AND ApplicationStatus = 'Accepted' ORDER BY ApplicationID DESC";
+                          $sql = "select * from finalyearproject.application WHERE Job_SeekerID = '$jobseekerid' AND ApplicationStatus = 'Accepted' ORDER BY ApplicationID DESC";
                         }
                         else if(isset($_GET['rejected'])){
-                          $sql = "select * from application WHERE Job_SeekerID = '$jobseekerid' AND ApplicationStatus = 'Rejected' ORDER BY ApplicationID DESC";
+                          $sql = "select * from finalyearproject.application WHERE Job_SeekerID = '$jobseekerid' AND ApplicationStatus = 'Rejected' ORDER BY ApplicationID DESC";
                         }
                         else{
-                          $sql = "select * from application WHERE Job_SeekerID = '$jobseekerid'ORDER BY ApplicationID DESC";
+                          $sql = "select * from finalyearproject.application WHERE Job_SeekerID = '$jobseekerid'ORDER BY ApplicationID DESC";
                         }
                         
-                      $result = mysqli_query($connect,$sql);
+                      $result = sqlsrv_query($connect,$sql);
                       
-                      while($row = mysqli_fetch_assoc($result))
+                      while($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC))
 										{
                       if(is_array($row))
                       { $appli = $row['ApplicationID'];
                         $new = $row['JobListingID']; 
-                        $sql2 = "select * from joblisting WHERE JobListingID = '$new' and is_deleted = '0'";
-                        $result2 = mysqli_query($connect,$sql2);
-                        $row2 = mysqli_fetch_assoc($result2);
+                        $sql2 = "select * from finalyearproject.joblisting WHERE JobListingID = '$new' and is_deleted = '0'";
+                        $result2 = sqlsrv_query($connect,$sql2);
+                        $row2 = sqlsrv_fetch_array($result2, SQLSRV_FETCH_ASSOC);
 
                         $new2 = $row['CompanyID'];
-                        $sql3 = "select * from company_info WHERE CompanyID = '$new2' and is_deleted = '0'";
-                        $result3 = mysqli_query($connect,$sql3);
-                        $row3 = mysqli_fetch_assoc($result3);
+                        $sql3 = "select * from finalyearproject.company_info WHERE CompanyID = '$new2' and is_deleted = '0'";
+                        $result3 = sqlsrv_query($connect,$sql3);
+                        $row3 = sqlsrv_fetch_array($result3, SQLSRV_FETCH_ASSOC);
                         
                         if(is_array($row2))
                         {
                             
                           if(is_array($row3)){
                             $new3 = $row2['JobCategoryID'];
-                            $sql4 = "select * from jobcategory WHERE JobCategoryID = '$new3' and is_deleted = '0'";
-                            $result4 = mysqli_query($connect,$sql4);
-                            $row4 = mysqli_fetch_assoc($result4);
+                            $sql4 = "select * from finalyearproject.jobcategory WHERE JobCategoryID = '$new3' and is_deleted = '0'";
+                            $result4 = sqlsrv_query($connect,$sql4);
+                            $row4 = sqlsrv_fetch_array($result4, SQLSRV_FETCH_ASSOC);
 
                             ?>
                             <td><?php echo $row2['JobTitle']; ?></td>

@@ -79,12 +79,12 @@
     $phonenumber = $_POST["phone"];
     $address = $_POST["address"];
 		
-		$query = "INSERT INTO job_seekerinfo(Job_SeekerFullname,Job_SeekerUsername,Job_SeekerPassword,Job_SeekerEmail,Job_SeekerPhone,Job_SeekerAddress,is_deleted)
+		$query = "INSERT INTO finalyearproject.job_seekerinfo(Job_SeekerFullname,Job_SeekerUsername,Job_SeekerPassword,Job_SeekerEmail,Job_SeekerPhone,Job_SeekerAddress,is_deleted)
 		VALUES('$name','$username','$password','$email','$phonenumber','$address','0')";
-		$result = mysqli_query($connect,$query);
+		$result = sqlsrv_query($connect,$query);
 		
 
-	mysqli_close($connect);
+	sqlsrv_close($connect);
 	
 	?>
 	

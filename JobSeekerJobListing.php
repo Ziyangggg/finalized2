@@ -1,8 +1,8 @@
 <?php
 include ("Jobseeker_session.php");
 require_once('connect.php');
-$query=mysqli_query($connect,"SELECT * FROM job_seekerinfo where Job_SeekerID='$jobseekerid' ")or die(mysqli_error());
-$row38=mysqli_fetch_array($query);
+$query=sqlsrv_query($connect,"SELECT * FROM finalyearproject.job_seekerinfo where Job_SeekerID='$jobseekerid' ")or die(sqlsrv_errors());
+$row38=sqlsrv_fetch_array($query);
 
 ?>
 
@@ -122,21 +122,21 @@ $row38=mysqli_fetch_array($query);
 									<div class="listing-boxes">
 											<div class="left">
 												<?php
-												$sql = "SELECT * FROM joblisting WHERE is_deleted='0' ";
+												$sql = "SELECT * FROM finalyearproject.joblisting WHERE is_deleted='0' ";
 												if(isset($_GET['search'])) {
 													$search = $_GET['search'];
 													$sql .= " AND JobTitle LIKE '%$search%' AND is_deleted='0' OR JobType LIKE '%$search%' AND is_deleted='0' ";
 													$sql .= " OR JobLocation LIKE '%$search%' AND is_deleted='0' ";
 												}
-												$result = mysqli_query($connect, $sql);
+												$result = sqlsrv_query($connect, $sql);
 												
-												while($row = mysqli_fetch_assoc($result))
+												while($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC))
 												{
 												$eee = $row['JobListingID'];
 												$new = $row['CompanyID']; 
-												$sql2 = "select * from company_info WHERE CompanyID = '$new' AND is_deleted='0'";
-												$result2 = mysqli_query($connect,$sql2);
-												$row2 = mysqli_fetch_assoc($result2);
+												$sql2 = "select * from finalyearproject.company_info WHERE CompanyID = '$new' AND is_deleted='0'";
+												$result2 = sqlsrv_query($connect,$sql2);
+												$row2 = sqlsrv_fetch_array($result2, SQLSRV_FETCH_ASSOC);
 												if(is_array($row2)){ 
 												?>
 												<div class="job-card">
@@ -192,14 +192,14 @@ $row38=mysqli_fetch_array($query);
 		$cid=$_GET['cid'];
 		$jobseekerid = $_SESSION["jobseekerid"];	
 
-		$sql66 = "SELECT * FROM resume_jobseeker WHERE Job_SeekerID = '$jobseekerid'";
-		$result666 = mysqli_query($connect, $sql66);
-		$row6 = mysqli_fetch_assoc($result666);
+		$sql66 = "SELECT * FROM finalyearproject.resume_jobseeker WHERE Job_SeekerID = '$jobseekerid'";
+		$result666 = sqlsrv_query($connect, $sql66);
+		$row6 = sqlsrv_fetch_array($result666, SQLSRV_FETCH_ASSOC);
 		if(is_array($row6)){ 
 			
-			$sql5 = "SELECT * from application WHERE CompanyID = '$cid' && Job_SeekerID = '$jobseekerid' && JobListingID = '$jid'";
-			$result5 = mysqli_query($connect,$sql5);
-			$row8 = mysqli_fetch_assoc($result5);
+			$sql5 = "SELECT * from finalyearproject.application WHERE CompanyID = '$cid' AND Job_SeekerID = '$jobseekerid' AND JobListingID = '$jid'";
+			$result5 = sqlsrv_query($connect,$sql5);
+			$row8 = sqlsrv_fetch_array($result5, SQLSRV_FETCH_ASSOC);
 			if(is_array($row8)){ 
 			echo "<script type='text/javascript'>
 			window.location.href='JobSeekerJobListing.php';
@@ -208,9 +208,9 @@ $row38=mysqli_fetch_array($query);
 			}
 		else{
 		
-		$query = "INSERT INTO application(DateApplied,ApplicationStatus,Job_SeekerID,CompanyID,JobListingID)
+		$query = "INSERT INTO finalyearproject.application(DateApplied,ApplicationStatus,Job_SeekerID,CompanyID,JobListingID)
 		VALUES('$date','In Progress','$jobseekerid','$cid','$jid')";
-		$result = mysqli_query($connect,$query);
+		$result = sqlsrv_query($connect,$query);
 ?>
 		<script type='text/javascript'>
 			window.location.href="JobSeekerJobListing.php";alert("Apply Done!");
@@ -234,9 +234,9 @@ $row38=mysqli_fetch_array($query);
 			$cid=$_GET['cid'];
 			$jobseekerid = $_SESSION["jobseekerid"];
 
-			$sql9 = "SELECT * from favourite WHERE Job_SeekerID = '$jobseekerid' && JobListingID = '$jid'";
-			$result6 = mysqli_query($connect,$sql9);
-			$row7 = mysqli_fetch_assoc($result6);
+			$sql9 = "SELECT * from finalyearproject.favourite WHERE Job_SeekerID = '$jobseekerid' AND JobListingID = '$jid'";
+			$result6 = sqlsrv_query($connect,$sql9);
+			$row7 = sqlsrv_fetch_array($result6, SQLSRV_FETCH_ASSOC);
 			if(is_array($row7)){ 
 			echo "<script type='text/javascript'>
 			window.location.href='JobSeekerJobListing.php';
@@ -244,9 +244,9 @@ $row38=mysqli_fetch_array($query);
 			</script>";
 			}
 			else{			
-				$query0 = "INSERT INTO favourite(Job_SeekerID,JobListingID)
+				$query0 = "INSERT INTO finalyearproject.favourite(Job_SeekerID,JobListingID)
 				VALUES('$jobseekerid','$jid')";
-				$result0 = mysqli_query($connect,$query0);
+				$result0 = sqlsrv_query($connect,$query0);
 		?>
 				<script type='text/javascript'>
 					window.location.href="JobSeekerJobListing.php";

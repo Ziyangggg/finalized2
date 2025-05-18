@@ -1,8 +1,8 @@
 <?php
 include("Jobseeker_session.php");
 require_once('connect.php');
-$query=mysqli_query($connect,"SELECT * FROM job_seekerinfo where Job_SeekerID='$jobseekerid' ")or die(mysqli_error());
-$row38=mysqli_fetch_array($query);
+$query=sqlsrv_query($connect,"SELECT * FROM finalyearproject.job_seekerinfo where Job_SeekerID='$jobseekerid' ")or die(sqlsrv_errors());
+$row38=sqlsrv_fetch_array($query);
 
 
 ?>
@@ -107,12 +107,12 @@ $row38=mysqli_fetch_array($query);
             $search = '';
             if (isset($_GET['search'])) {
             $search = $_GET['search'];
-            $query = "select * from company_info where  CompanyUsername LIKE '%$search%' AND is_deleted='0' OR CompanyName LIKE '%$search%'  AND  is_deleted='0'";
+            $query = "select * from finalyearproject.company_info where  CompanyUsername LIKE '%$search%' AND is_deleted='0' OR CompanyName LIKE '%$search%'  AND  is_deleted='0'";
             } else {
-            $query = "SELECT * FROM company_info WHERE is_deleted='0' ";
+            $query = "SELECT * FROM finalyearproject.company_info WHERE is_deleted='0' ";
             }
 
-$result = mysqli_query($connect, $query);
+$result = sqlsrv_query($connect, $query);
 ?>
     
     <div class="profile-details">
@@ -134,7 +134,7 @@ $result = mysqli_query($connect, $query);
     
               <div class="container">
                  <?php
-                   while($row = mysqli_fetch_assoc($result) ){
+                   while($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC) ){
                     $fff = $row['CompanyID']; 
                     
                  ?>

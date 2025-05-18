@@ -68,8 +68,8 @@
 	//$username = mysqli_real_escape_string($connect,$username);
 	//$password = mysqli_real_escape_string($connect,$password);
 	
-	$query = "UPDATE job_seekerinfo SET Job_SeekerPassword = '$newpassword' WHERE Job_SeekerEmail='$aftemail'";
-	$result = mysqli_query($connect,$query);
+	$query = "UPDATE finalyearproject.job_seekerinfo SET Job_SeekerPassword = '$newpassword' WHERE Job_SeekerEmail='$aftemail'";
+	$result = sqlsrv_query($connect,$query);
 ?>
 <script>
 		alert("New Password Is Set");
@@ -78,7 +78,7 @@
 
 <?php
 }
-mysqli_close($connect);
+sqlsrv_close($connect);
 ?>
 
 

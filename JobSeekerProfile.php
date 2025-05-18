@@ -9,8 +9,8 @@
   <?php
 include("Jobseeker_session.php");
 require_once('connect.php');
-$query=mysqli_query($connect,"SELECT * FROM job_seekerinfo where Job_SeekerID='$jobseekerid' ")or die(mysqli_error());
-$row=mysqli_fetch_array($query);
+$query=sqlsrv_query($connect,"SELECT * FROM finalyearproject.job_seekerinfo where Job_SeekerID='$jobseekerid' ")or die(sqlsrv_errors());
+$row=sqlsrv_fetch_array($query);
 
 ?>
   <body>
@@ -205,8 +205,8 @@ $row=mysqli_fetch_array($query);
   //不明白就看回去companyprofile那边
 	include("connect.php");
 	
-  $query=mysqli_query($connect,"SELECT * FROM job_seekerinfo where Job_SeekerID='$jobseekerid'")or die(mysqli_error());
-  $row=mysqli_fetch_array($query);
+  $query=sqlsrv_query($connect,"SELECT * FROM finalyearproject.job_seekerinfo where Job_SeekerID='$jobseekerid'")or die(sqlsrv_errors());
+  $row=sqlsrv_fetch_array($query);
 	if(isset($_POST["submit"]))
 	{
 		$name = $_POST["fullname"];
@@ -216,8 +216,8 @@ $row=mysqli_fetch_array($query);
     $phonenumber = $_POST["phone"];
     $address = $_POST["address"];
 		
-		$query = "UPDATE job_seekerinfo SET Job_SeekerFullname='$name',Job_SeekerUsername='$username',Job_SeekerPassword='$password',Job_SeekerEmail='$email',Job_SeekerPhone='$phonenumber',Job_SeekerAddress='$address' WHERE Job_SeekerID =$jobseekerid";
-		$result = mysqli_query($connect,$query) or die(mysqli_error($connect));
+		$query = "UPDATE finalyearproject.job_seekerinfo SET Job_SeekerFullname='$name',Job_SeekerUsername='$username',Job_SeekerPassword='$password',Job_SeekerEmail='$email',Job_SeekerPhone='$phonenumber',Job_SeekerAddress='$address' WHERE Job_SeekerID =$jobseekerid";
+		$result = sqlsrv_query($connect,$query) or die(sqlsrv_errors($connect));
 		
 
 	

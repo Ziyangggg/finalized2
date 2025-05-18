@@ -65,10 +65,10 @@ require 'phpmailer/src/SMTP.php';
 if(isset($_POST["sendforget"])){
     
     $email=$_REQUEST['forget-email'];
-    $query = "SELECT * FROM job_seekerinfo where Job_SeekerEmail = '$email'  and is_deleted = '0'";
+    $query = "SELECT * FROM finalyearproject.job_seekerinfo where Job_SeekerEmail = '$email'  and is_deleted = '0'";
     
-    $check_email=mysqli_query($connect,$query);
-    $res=mysqli_num_rows($check_email);
+    $check_email=sqlsrv_query($connect,$query);
+    $res=sqlsrv_num_rows($check_email);
     if($res>0)
     {
         $message = '<div>

@@ -1,8 +1,8 @@
 <?php
 include("Jobseeker_session.php");
 require_once('connect.php');
-$query=mysqli_query($connect,"SELECT * FROM job_seekerinfo where Job_SeekerID='$jobseekerid' ")or die(mysqli_error());
-$row38=mysqli_fetch_array($query);
+$query=sqlsrv_query($connect,"SELECT * FROM finalyearproject.job_seekerinfo where Job_SeekerID='$jobseekerid' ")or die(sqlsrv_errors());
+$row38=sqlsrv_fetch_array($query);
 ?>
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
@@ -110,8 +110,8 @@ $row38=mysqli_fetch_array($query);
         <?php
         $ggg=$_GET["456"];
         $query = "select * from company_info WHERE CompanyID = $ggg and is_deleted = '0'";
-        $result = mysqli_query($connect,$query);      
-        if($row = mysqli_fetch_assoc($result)){
+        $result = sqlsrv_query($connect,$query);      
+        if($row = sqlsrv_fetch_array($result,SQLSRV_FETCH_ASSOC)){
           $new = $row['CompanyID']; 
 
         ?>
@@ -174,20 +174,20 @@ $row38=mysqli_fetch_array($query);
               <tr>
                           <?php
                           $companyid = $row["CompanyID"];
-                          $query = "select * from feedback WHERE CompanyID = $companyid ";
-                          $result = mysqli_query($connect,$query);
-                          while($row98 = mysqli_fetch_assoc($result))
+                          $query = "select * from finalyearproject.feedback WHERE CompanyID = $companyid ";
+                          $result = sqlsrv_query($connect,$query);
+                          while($row98 = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC))
                           {
                             $new = $row98['Job_SeekerID']; 
-                            $sql2 = "select * from job_seekerinfo WHERE Job_SeekerID = '$new'and is_deleted = '0'";
-                            $result2 = mysqli_query($connect,$sql2);
-                            $row97 = mysqli_fetch_assoc($result2);
+                            $sql2 = "select * from finalyearproject.job_seekerinfo WHERE Job_SeekerID = '$new'and is_deleted = '0'";
+                            $result2 = sqlsrv_query($connect,$sql2);
+                            $row97 = sqlsrv_fetch_array($result2, SQLSRV_FETCH_ASSOC);
                             if(is_array($row97)){
                             
                             $new2 = $row['CompanyID']; 
-                            $sql3 = "select CompanyName from company_info WHERE CompanyID = '$new2'and is_deleted = '0'";
-                            $result3 = mysqli_query($connect,$sql3);
-                            $row96 = mysqli_fetch_assoc($result3);
+                            $sql3 = "select CompanyName from finalyearproject.company_info WHERE CompanyID = '$new2'and is_deleted = '0'";
+                            $result3 = sqlsrv_query($connect,$sql3);
+                            $row96 = sqlsrv_fetch_array($result3, SQLSRV_FETCH_ASSOC);
                             if(is_array($row96)){
                           ?>
                           <td><?php echo $row98['FeedBackID']; ?></td>
@@ -214,9 +214,9 @@ $row38=mysqli_fetch_array($query);
             
             <div class="similarboxes">
               <?php
-                      $sql2 = "select * from joblisting WHERE CompanyID = '$ggg' AND is_deleted = '0' ORDER BY JobListingID DESC ";
-                      $result2 = mysqli_query($connect,$sql2);
-                    while($row2 = mysqli_fetch_assoc($result2)){
+                      $sql2 = "select * from finalyearproject.joblisting WHERE CompanyID = '$ggg' AND is_deleted = '0' ORDER BY JobListingID DESC ";
+                      $result2 = sqlsrv_query($connect,$sql2);
+                    while($row2 = sqlsrv_fetch_array($result2, SQLSRV_FETCH_ASSOC)){
                        $abc = $row2['JobListingID'];
               ?>
                 <div class="box">
