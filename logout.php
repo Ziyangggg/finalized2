@@ -8,6 +8,6 @@ session_destroy();
 
 echo "<SCRIPT> 
         alert('Logged Out !!')
-        window.location.replace('LoginPage.php');
+        window.location.replace('JobSeekerJobListing.php');
     </SCRIPT>";
 ?>

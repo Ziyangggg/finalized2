@@ -2,7 +2,7 @@
 <?php
 require_once('connect.php'); // Make sure this uses sqlsrv_connect()
 
-$id = $_SESSION["userid"];
+$id = $_SESSION["adminid"];
 
 $sql = "SELECT * FROM finalyearproject.admin_info WHERE AdminID = ?";
 $params = array($id);
@@ -124,7 +124,7 @@ $row49 = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
     </div>
     
     <div class="profile-details">
-    <span class="admin_name"><?php echo $_SESSION["fullname"] ?></span>
+    <span class="admin_name"><?php echo $row49["AdminUsername"] ?></span>
     </div>
   </nav>
   <section class="home-section">
@@ -154,7 +154,7 @@ $row49 = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
                 
             <tr>
                           <?php
-                            $username = $_SESSION["fullname"]; // show admin name
+                            $username = $_SESSION["adminusername"]; // show admin name
 
                             // Query all job listings not marked as deleted
                             $sql = "SELECT * FROM finalyearproject.joblisting WHERE is_deleted = '0' ORDER BY JobListingID DESC";

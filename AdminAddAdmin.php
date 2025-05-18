@@ -1,9 +1,7 @@
 <?php 
-include("admin_session.php"); // Make sure this checks role == 'admin'
-include("connect.php"); // Uses sqlsrv_connect
+include("admin_session.php"); 
 
-
-$id = $_SESSION["userid"];
+$id = $_SESSION["adminid"];
 
 $sql = "SELECT * FROM finalyearproject.admin_info WHERE AdminID = ?";
 $params = array($id);
@@ -124,7 +122,8 @@ sqlsrv_free_stmt($stmt);
     </div>
     
     <div class="profile-details">
-      <span class="admin_name"><?php echo $_SESSION["fullname"] ?></span>
+      <span class="admin_name"><?php echo $row["AdminUsername"] ?></span>
+      
     </div>
   </nav>
   <section class="home-section">
@@ -233,51 +232,30 @@ sqlsrv_free_stmt($stmt);
 <script src="script.js"></script>
 
 <?php
-include("connect.php");
+  $username = $_SESSION["adminusername"]; // show admin name
+  include("connect.php");
 
-if (isset($_POST["submit"])) {
+  if (isset($_POST["submit"])) {
     $name = $_POST["fullname"];
     $username = $_POST["username"];
     $password = $_POST["password"];
     $emailaddress = $_POST["emailaddress"];
     $phonenumber = $_POST["phonenumber"];
     $address = $_POST["address"];
-    $fullname = $_POST["fullname"];
 
-    // Check for duplicate username first
-    $checkUserSQL = "SELECT COUNT(*) AS cnt FROM finalyearproject.users WHERE Username = ?";
-    $checkUserStmt = sqlsrv_query($connect, $checkUserSQL, array($username));
+    $sql = "INSERT INTO finalyearproject.admin_info 
+            (AdminFullName, AdminUsername, AdminPassword, AdminEmail, AdminPhone, AdminAddress)
+            VALUES (?, ?, ?, ?, ?, ?)";
 
-    if ($checkUserStmt === false) {
+    $params = array($name, $username, $password, $emailaddress, $phonenumber, $address);
+
+    $stmt = sqlsrv_query($connect, $sql, $params);
+
+    if ($stmt === false) {
         die(print_r(sqlsrv_errors(), true));
     }
 
-    $count = 0;
-    if ($row = sqlsrv_fetch_array($checkUserStmt, SQLSRV_FETCH_ASSOC)) {
-        $count = (int)$row['cnt'];
-    }
-
-    if ($count > 0) {
-        echo "<script>alert('Username already exists. Please choose another username.'); window.location.href = 'AdminAddAdmin.php';</script>";
-        exit;
-    }
-
-    // Hash the password
-    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
-    // Insert into users table with FullName column
-    $userInsertSQL = "INSERT INTO finalyearproject.users 
-        (Username, UserPassword, UserEmail, UserPhone, UserAddress, Role, is_deleted, CreatedAt, FullName)
-        VALUES (?, ?, ?, ?, ?, 'admin', 0, GETDATE(),?)";
-
-    $userParams = array($username, $hashedPassword, $emailaddress, $phonenumber, $address, $fullname);
-    $userStmt = sqlsrv_query($connect, $userInsertSQL, $userParams);
-
-    if ($userStmt === false) {
-        die(print_r(sqlsrv_errors(), true));
-    }
-
-    sqlsrv_free_stmt($userStmt);
+    sqlsrv_free_stmt($stmt);
     sqlsrv_close($connect);
 ?>
     <script>
@@ -285,5 +263,5 @@ if (isset($_POST["submit"])) {
         window.location.href = "AdminAddAdmin.php";
     </script>
 <?php
-}
+  }
 ?>

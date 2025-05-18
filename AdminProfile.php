@@ -2,11 +2,11 @@
 include("admin_session.php"); 
 require_once('connect.php');
 
-$username = $_SESSION["username"];
-$id = $_SESSION["userid"];
+$username = $_SESSION["adminusername"];
+$id = $_SESSION["adminid"];
 
 // Use parameterized query to avoid SQL injection
-$sql = "SELECT * FROM finalyearproject.users WHERE UserID = ?";
+$sql = "SELECT * FROM finalyearproject.admin_info WHERE AdminID = ?";
 $params = array($id);
 
 // Query the database using SQLSRV
@@ -126,7 +126,7 @@ sqlsrv_free_stmt($stmt);
     </div>
     
     <div class="profile-details">
-      <span class="admin_name"><?php echo $row["FullName"] ?></span>
+      <span class="admin_name"><?php echo $row["AdminUsername"] ?></span>
       
     </div>
   </nav>
@@ -154,7 +154,7 @@ sqlsrv_free_stmt($stmt);
               
                 <div class="form-group">
                   <label>Name</label>
-                  <input name="fullname" placeholder="Enter new admin Name" type="text" class="form-control"  value="<?php echo $row["FullName"]; ?>" required>
+                  <input name="fullname" placeholder="Enter new admin Name" type="text" class="form-control"  value="<?php echo $row["AdminFullName"]; ?>" required>
                 </div>
                 
               </div>
@@ -164,7 +164,7 @@ sqlsrv_free_stmt($stmt);
               
                 <div class="form-group">
                   <label>Username</label>
-                    <input name="username" placeholder="Enter new  Username" type="text" class="form-control" value="<?php echo $row["Username"]; ?>" required>
+                    <input name="username" placeholder="Enter new  Username" type="text" class="form-control" value="<?php echo $row["AdminUsername"]; ?>" required>
                 </div>
                 
               </div>
@@ -173,7 +173,7 @@ sqlsrv_free_stmt($stmt);
               
                 <div class="form-group">
                   <label>Password</label>
-                    <input class="form-control" placeholder="Enter Password" name="password" required type="password" value="<?php echo $row["UserPassword"]; ?>" required> 
+                    <input class="form-control" placeholder="Enter Password" name="password" required type="password" value="<?php echo $row["AdminPassword"]; ?>" required> 
                 </div>
                 
               </div>
@@ -186,7 +186,7 @@ sqlsrv_free_stmt($stmt);
               
                 <div class="form-group">
                   <label>Phone Number</label>
-                  <input type="tel" name="phonenumber" pattern="[0-9]{10,11}" required class="form-control" placeholder="Enter Phone Number Exp:0176899754" value="<?php echo $row["UserPhone"]; ?>">
+                  <input type="tel" name="phonenumber" pattern="[0-9]{10,11}" required class="form-control" placeholder="Enter Phone Number Exp:0176899754" value="<?php echo $row["AdminPhone"]; ?>">
                 </div>
                 
               </div>
@@ -195,7 +195,7 @@ sqlsrv_free_stmt($stmt);
               
                 <div class="form-group">
                   <label>Email Address</label>
-                  <input type="email" name="emailaddress" required class="form-control"  placeholder="Enter Admin email" value="<?php echo $row["UserEmail"]; ?>">
+                  <input type="email" name="emailaddress" required class="form-control"  placeholder="Enter Admin email" value="<?php echo $row["AdminEmail"]; ?>">
                 </div>
                 
               </div>
@@ -204,7 +204,7 @@ sqlsrv_free_stmt($stmt);
               
                 <div class="form-group">
                   <label>Address</label>
-                  <input type="text" name="address" required class="form-control"  placeholder="Enter Admin address" value="<?php echo $row["UserAddress"]; ?>">
+                  <input type="text" name="address" required class="form-control"  placeholder="Enter Admin address" value="<?php echo $row["AdminAddress"]; ?>">
                 </div>
                 
               </div>
@@ -243,15 +243,14 @@ if (isset($_POST["submit"])) {
     $phone = $_POST["phonenumber"];
     $email = $_POST["emailaddress"];
 
-    
-    // Hash the password securely
-    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+    // Make sure $adminid is set, e.g., from session
+    $adminid = $_SESSION['adminid']; 
 
-    $sql = "UPDATE finalyearproject.users 
-            SET Username = ?, UserPassword = ?, UserEmail = ?, UserPhone = ?, UserAddress = ?, FullName = ?
-            WHERE UserID = ?";
+    $sql = "UPDATE finalyearproject.admin_info 
+            SET AdminFullName = ?, AdminPassword = ?, AdminUsername = ?, AdminEmail = ?, AdminPhone = ?, AdminAddress = ? 
+            WHERE AdminID = ?";
 
-    $params = array($username, $hashedPassword,  $email, $phone, $address, $name, $userid);
+    $params = array($name, $password, $username, $email, $phone, $address, $adminid);
 
     $stmt = sqlsrv_query($connect, $sql, $params);
 
