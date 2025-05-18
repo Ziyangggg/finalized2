@@ -116,7 +116,7 @@ $row49 = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
                                 
                                     <div class="form-group">
                                         <label>Job Title</label>
-                                        <input name="title" required type="text" class="form-control" placeholder="Enter job title">
+                                        <input name="title" required type="text" class="form-control" placeholder="Enter job title" value="<?php echo isset($title) ? htmlspecialchars($title, ENT_QUOTES, 'UTF-8'):''; ?>">
                                     </div>
                                     
                                 </div>
@@ -127,7 +127,7 @@ $row49 = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
                                 
                                 <div class="form-group">
                                     <label>Location</label>
-                                    <input name="location" required type="text" class="form-control" placeholder="Enter Location">
+                                    <input name="location" required type="text" class="form-control" placeholder="Enter Location" value="<?php echo isset($location) ? htmlspecialchars($location, ENT_QUOTES, 'UTF-8'):''; ?>">
                                 </div>
                                 
                       
@@ -176,7 +176,7 @@ $row49 = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
                                 
                                   <div class="form-group">
                                       <label>Salary</label>
-                                      <input name="salary" required type="number" class="form-control" placeholder="Eg: 2000">
+                                      <input name="salary" required type="number" class="form-control" placeholder="Eg: 2000" value="<?php echo isset($salary) ? htmlspecialchars($salary, ENT_QUOTES, 'UTF-8'):''; ?>">
                                   </div>
                                   
                               </div>
@@ -210,7 +210,7 @@ $row49 = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
                                 
                                     <div class="form-group bootstrap3-wysihtml5-wrapper">
                                         <label>Job Description</label>
-                                        <textarea class="form-control bootstrap3-wysihtml5" name="description" required placeholder="Enter description ..." style="height: 200px;"></textarea>
+                                        <textarea class="form-control bootstrap3-wysihtml5" name="description" required placeholder="Enter description ..." style="height: 200px;"><?php echo isset($description) ? htmlspecialchars($description, ENT_QUOTES, 'UTF-8'):''; ?></textarea>
                                     </div>
                                     
                                 </div>
@@ -225,7 +225,7 @@ $row49 = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
                                 
                                     <div class="form-group bootstrap3-wysihtml5-wrapper">
                                         <label>Requirements</label>
-                                        <textarea name="requirements" required class="form-control bootstrap3-wysihtml5" placeholder="Enter requirements..." style="height: 200px;"></textarea>
+                                        <textarea name="requirements" required class="form-control bootstrap3-wysihtml5" placeholder="Enter requirements..." style="height: 200px;"><?php echo isset($requirements) ? htmlspecialchars($requirements, ENT_QUOTES, 'UTF-8'):''; ?></textarea>
                                     </div>
                                     
                                 </div>
@@ -290,13 +290,13 @@ $row49 = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
 	
 	if(isset($_POST["submit"]))
 	{
-		$title = $_POST["title"];
-		$location = $_POST["location"];
+		$title = trim($_POST["title"]);
+		$location = trim($_POST["location"]);
 		$category = $_POST["category"];
-		$salary = $_POST["salary"];
+		$salary = trim($_POST["salary"]);
     $jobtype = $_POST["jobtype"];
-    $description = $_POST["description"];
-    $requirements = $_POST["requirements"];
+    $description = trim($_POST["description"]);
+    $requirements = trim($_POST["requirements"]);
     $companyid = $_SESSION["companyid"];
     $jobcategoryid = $_POST["category"];
 		
@@ -313,12 +313,6 @@ $row49 = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
     }
 
     sqlsrv_close($connect);
-	// 	$query = "INSERT INTO joblisting(JobTitle,JobDescription,JobSalary,JobRequirement,JobType,JobLocation,JobCategoryID,CompanyID,is_deleted)
-	// 	VALUES('$title','$description','$salary','$requirements','$jobtype','$location','$jobcategoryid','$companyid','0')";
-	// 	$result = mysqli_query($connect,$query);
-		
-
-	// mysqli_close($connect);
 	?>
 	
 	<script>
