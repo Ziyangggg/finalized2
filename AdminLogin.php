@@ -5,7 +5,7 @@ if (!isset($_SESSION['attempts'])) {
     $_SESSION['last_attempt_time'] = time();
 }
 
-if (time() - $_SESSION['last_attempt_time'] < 60 && $_SESSION['attempts'] >= 5) {
+if (time() - $_SESSION['last_attempt_time'] < 60   && $_SESSION['attempts'] >= 5) {
     die("Too many login attempts. Please wait 5 minutes.");
 }
 
@@ -80,6 +80,8 @@ if (isset($_POST["submit"])) {
     if ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
         // Use password_verify to compare input password with stored hashed password
         if (password_verify($password, $row["AdminPassword"])) {
+            unset($_SESSION['attempts']);
+            unset($_SESSION['last_attempt_time']);
             session_regenerate_id(true);
 
             $_SESSION["adminusername"] = $row["AdminUsername"];
@@ -92,10 +94,18 @@ if (isset($_POST["submit"])) {
                 window.location.href = 'AdminDashboard.php';
             </script>";
         }else{
-            echo "<script>
-            alert('Login failed');
-            window.location.href = window.location.href;
-        </script>";
+              // only record when login failed
+            if (!isset($_SESSION['attempts'])) {
+                  $_SESSION['attempts'] = 0;
+              }
+
+              $_SESSION['attempts']++;
+              $_SESSION['last_attempt_time'] = time();
+
+              echo "<script>
+                  alert('Login failed.');
+                  window.location.href = window.location.href;
+              </script>";
         }
     } else {
         echo "<script>
