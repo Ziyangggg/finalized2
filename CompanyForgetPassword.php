@@ -58,58 +58,54 @@ require 'phpmailer/src/Exception.php';
 require 'phpmailer/src/PHPMailer.php';
 require 'phpmailer/src/SMTP.php';
 
+if (isset($_POST["sendforget"])) {
+    $email = $_REQUEST['forget-email'];
+    $query = "SELECT * FROM finalyearproject.company_info WHERE CompanyEmail = ? AND is_deleted = '0'";
+    $params = array($email);
+    $stmt = sqlsrv_query($connect, $query, $params);
 
+    if ($stmt === false) {
+        echo "<script>alert('Database error');</script>";
+    } else {
+        if (sqlsrv_has_rows($stmt)) {
+            $message = '<div>
+                <p><b>Hello!</b></p>
+                <p>You are receiving this email because we received a password reset request for your account.</p>
+                <br>
+                <p><a href="http://localhost/finalized2/CompanyResetPassword.php?secret=' . base64_encode($email) . '">Reset Password</a></p>
+                <p>If you did not request a password reset, no further action is required.</p>
+            </div>';
 
+            $mail = new PHPMailer(true);
 
+            try {
+                $mail->isSMTP();
+                $mail->Host       = 'smtp.gmail.com';
+                $mail->SMTPAuth   = true;
+                $mail->Username   = 'jobseeker331@gmail.com';
+                $mail->Password   = 'anojplqdhzzxrhfs';
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+                $mail->Port       = 465;
 
-if(isset($_POST["sendforget"])){
-    
-    $email=$_REQUEST['forget-email'];
-    $query = "SELECT * FROM company_info where CompanyEmail = '$email'  and is_deleted = '0'";
-    
-    $check_email=mysqli_query($connect,$query);
-    $res=mysqli_num_rows($check_email);
-    if($res>0)
-    {
-        $message = '<div>
-        <p><b>Hello!</b></p>
-        <p>You are recieving this email because we recieved a password reset request for your account.</p>
-        <br>
-        <p><a href="http://localhost/finalized2/CompanyResetPassword.php?secret='.base64_encode($email).'">Reset Password</a></p>
-        <p>If you did not request a password reset, no further action is required.</p>
-       </div>';
+                $mail->setFrom('jobseeker331@gmail.com');
+                $mail->addAddress($email);
 
-       
-    $mail = new PHPMailer(true);
+                $mail->isHTML(true);
+                $mail->Subject = 'Recover your password';
+                $mail->Body    = $message;
 
-    $mail->isSMTP();                                            //Send using SMTP
-    $mail->Host       = 'smtp.gmail.com';                     //Set the SMTP server to send through
-    $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
-    $mail->Username   = 'jobseeker331@gmail.com';                     //SMTP username
-    $mail->Password   = 'anojplqdhzzxrhfs';                               //SMTP password
-    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
-    $mail->Port       = 465;         
-
-
-    $mail->setFrom('jobseeker331@gmail.com');
-    $mail->addAddress($_POST['forget-email']);     //Add a recipient
-
-    
-    $mail->isHTML(true);                                  //Set email format to HTML
-    $mail->Subject = 'Recover your password';
-    $mail->Body    = $message;
-    if($mail->send())
-    {
-      echo  "<script>alert('Sent Successfully');
-             window.location.replace('CompanyLogin.php');
-            </script>";
+                if ($mail->send()) {
+                    echo "<script>
+                        alert('Sent Successfully');
+                        window.location.replace('CompanyLogin.php');
+                    </script>";
+                }
+            } catch (Exception $e) {
+                echo "<script>alert('Mailer Error: {$mail->ErrorInfo}');</script>";
+            }
+        } else {
+            echo "<script>alert('The email is not a registered email');</script>";
+        }
     }
-    }
-    else
-    {
-        echo  "<script>alert('The email is not registed email')</script>";
-    }
-    
-
 }
 ?>

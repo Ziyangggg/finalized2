@@ -63,10 +63,11 @@
     $aftemail=base64_decode($b4email);
 	  $newpassword = $_POST["password"];
 	
+	  $hashed_password = password_hash($newpassword, PASSWORD_DEFAULT);
 	
-	
-	$query = "UPDATE company_info SET CompanyPassword = '$newpassword' WHERE CompanyEmail='$aftemail'";
-	$result = mysqli_query($connect,$query);
+	$sql = "UPDATE finalyearproject.company_info SET CompanyPassword = ? WHERE CompanyEmail = ?";
+	$params = array($hashed_password, $aftemail);
+  $stmt = sqlsrv_query($connect, $sql, $params);
 ?>
 <script>
 		alert("New Password Is Set");
