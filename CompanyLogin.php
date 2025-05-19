@@ -90,6 +90,6 @@ if (isset($_POST["submit"])) {
     }
 
     sqlsrv_free_stmt($stmt);
-    sqlsrv_close($conn);
+    sqlsrv_close($connect);
 }
 ?>
