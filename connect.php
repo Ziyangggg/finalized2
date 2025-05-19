@@ -2,8 +2,8 @@
 $serverName = "localhost"; // or "localhost\\SQLEXPRESS"
 $connectionOptions = array(
     "Database" => "finalyearproject",
-    "Uid" => "superadmin",          // use the login you just created
-    "PWD" => "1234",      // password for that login
+    "Uid" => "sql_public",          // use the login you just created
+    "PWD" => "public",      // password for that login
     "CharacterSet" => "UTF-8"
 );
 
