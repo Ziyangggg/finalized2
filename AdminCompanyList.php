@@ -1,6 +1,5 @@
 <?php 
 include("admin_session.php");
-require_once('connect.php');
 
 $id = $_SESSION["adminid"];
 
@@ -131,7 +130,7 @@ if ($result2 === false) {
     </div>
     
     <div class="profile-details">
-    <span class="admin_name"><?php echo $row49["AdminUsername"] ?></span>
+    <span class="admin_name"><?php echo $row49["AdminFullName"] ?></span>
       
     </div>
   </nav>

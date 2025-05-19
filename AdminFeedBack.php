@@ -1,6 +1,5 @@
 <?php
 include("admin_session.php");
-require_once('connect.php'); // your connection file should use sqlsrv_connect
 
 $id = $_SESSION["adminid"];
 
@@ -120,7 +119,7 @@ $row49 = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
     </div>
     
     <div class="profile-details">
-    <span class="admin_name"><?php echo $row49["AdminUsername"] ?></span>
+    <span class="admin_name"><?php echo $row49["AdminFullName"] ?></span>
       
     </div>
   </nav>

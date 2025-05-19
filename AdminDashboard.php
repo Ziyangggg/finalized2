@@ -1,7 +1,5 @@
 <?php include("admin_session.php"); ?>
 <?php
-include('connect.php'); // This should be using sqlsrv_connect
-
 $id = $_SESSION["adminid"];
 
 // Parameterized query to avoid SQL injection

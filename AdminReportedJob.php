@@ -1,7 +1,5 @@
 <?php include("admin_session.php"); ?>
 <?php
-require_once('connect.php'); // Make sure this uses sqlsrv_connect()
-
 $id = $_SESSION["adminid"];
 
 $sql = "SELECT * FROM finalyearproject.admin_info WHERE AdminID = ?";
@@ -126,7 +124,7 @@ $row49 = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
     </div>
     
     <div class="profile-details">
-    <span class="admin_name"><?php echo $row49["AdminUsername"] ?></span>
+    <span class="admin_name"><?php echo $row49["AdminFullName"] ?></span>
       
     </div>
   </nav>

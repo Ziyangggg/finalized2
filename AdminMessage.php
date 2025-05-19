@@ -1,8 +1,6 @@
 <?php include("admin_session.php"); ?>
 <?php
 
-require_once('connect.php');
-
 // Get admin ID from session
 $id = $_SESSION["adminid"];
 
@@ -130,7 +128,7 @@ if ($stmt2 === false) {
     </div>
     
     <div class="profile-details">
-    <span class="admin_name"><?php echo $row49["AdminUsername"] ?></span>
+    <span class="admin_name"><?php echo $row49["AdminFullName"] ?></span>
       
     </div>
   </nav>

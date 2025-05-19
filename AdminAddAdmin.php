@@ -122,7 +122,7 @@ sqlsrv_free_stmt($stmt);
     </div>
     
     <div class="profile-details">
-      <span class="admin_name"><?php echo $row["AdminUsername"] ?></span>
+      <span class="admin_name"><?php echo $row["AdminFullName"] ?></span>
       
     </div>
   </nav>

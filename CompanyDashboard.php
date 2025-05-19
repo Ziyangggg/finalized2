@@ -1,16 +1,20 @@
 <?php
-require_once('connect.php');
 include('company_session.php');
+
+$id = $_SESSION["companyid"];
+
 $sql = "SELECT * FROM finalyearproject.Company_Info WHERE CompanyID = ? AND is_deleted = '0'";
-$params = array($companyid);
+$params = array($id);
 
-$query = sqlsrv_query($connect, $sql, $params);
+$stmt = sqlsrv_query($connect, $sql, $params);
 
-if ($query === false) {
+if ($stmt === false) {
     die(print_r(sqlsrv_errors(), true));
 }
 
-$row49 = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC);
+$row49 = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+
+sqlsrv_free_stmt($stmt);
 ?>
 
 <!DOCTYPE html>
