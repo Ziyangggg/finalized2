@@ -5,7 +5,7 @@ if (!isset($_SESSION['attempts'])) {
     $_SESSION['last_attempt_time'] = time();
 }
 
-if (time() - $_SESSION['last_attempt_time'] < 300 && $_SESSION['attempts'] >= 5) {
+if (time() - $_SESSION['last_attempt_time'] < 60 && $_SESSION['attempts'] >= 5) {
     die("Too many login attempts. Please wait 5 minutes.");
 }
 

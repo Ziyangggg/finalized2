@@ -27,7 +27,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'Admin') {
 }
 
 // Timeout setting
-define('SESSION_TIMEOUT', 60); // 1 minute
+define('SESSION_TIMEOUT', value: 60); // 1 minute
 
 // Check last activity time
 if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > SESSION_TIMEOUT)) {
