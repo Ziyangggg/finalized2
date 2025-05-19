@@ -5,10 +5,6 @@ if (!isset($_SESSION['attempts'])) {
     $_SESSION['last_attempt_time'] = time();
 }
 
-if (time() - $_SESSION['last_attempt_time'] < 60   && $_SESSION['attempts'] >= 5) {
-    die("Too many login attempts. Please wait 5 minutes.");
-}
-
 // On failed login:
 $_SESSION['attempts']++;
 $_SESSION['last_attempt_time'] = time();
@@ -65,6 +61,14 @@ $_SESSION['last_attempt_time'] = time();
 include("connect.php"); // Must use sqlsrv_connect for SQL Server
 
 if (isset($_POST["submit"])) {
+    if (isset($_SESSION['attempts']) && $_SESSION['attempts'] >= 5 && (time() - $_SESSION['last_attempt_time'] < 300)) {
+        echo "<script>
+            alert('Too many login attempts. Please wait 5 minutes.');
+            window.location.href = window.location.href;
+        </script>";
+        exit;
+    }
+
     $username = $_POST["adminusername"];
     $password = $_POST["adminpassword"];
 
@@ -106,12 +110,7 @@ if (isset($_POST["submit"])) {
                   alert('Login failed.');
                   window.location.href = window.location.href;
               </script>";
-        }
-    } else {
-        echo "<script>
-            alert('Login failed');
-            window.location.href = window.location.href;
-        </script>";
+          }
     }
 
     sqlsrv_free_stmt($stmt);
