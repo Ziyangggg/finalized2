@@ -187,7 +187,6 @@ $row49 = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC);
 
 <?php
 $username = $_SESSION["adminusername"]; // show admin name
-include("connect.php");
 
 if (isset($_POST["submit"])) {
     $category = $_POST["category"];

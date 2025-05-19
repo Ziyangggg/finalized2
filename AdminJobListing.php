@@ -273,7 +273,6 @@ function confirmation()
 </script>
 
 <?php
-require_once('connect.php'); // Ensure this includes your SQLSRV connection
 
 if (isset($_GET['dlt'])) {
     $jid = $_GET['jid'];

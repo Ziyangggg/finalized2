@@ -1,13 +1,10 @@
 <?php
 session_start();
+
 if (!isset($_SESSION['attempts'])) {
     $_SESSION['attempts'] = 0;
-    $_SESSION['last_attempt_time'] = time();
+    $_SESSION['last_attempt_time'] = 0;
 }
-
-// On failed login:
-$_SESSION['attempts']++;
-$_SESSION['last_attempt_time'] = time();
 ?>
 
 <!DOCTYPE html>
@@ -41,9 +38,9 @@ $_SESSION['last_attempt_time'] = time();
                   <i class="fas fa-lock"></i>
                   <input type="password" name="adminpassword" placeholder="Enter your password" required>
                 </div>
-                <div class="forget">
+                <!-- <div class="forget">
                   Forget <a href="AdminForgetPassword.php">Password</a>
-                </div>
+                </div> -->
                 <div class="button input-box">
                   <input type="submit" value="Submit" name="submit">
                 </div>
@@ -61,7 +58,7 @@ $_SESSION['last_attempt_time'] = time();
 include("connect.php"); // Must use sqlsrv_connect for SQL Server
 
 if (isset($_POST["submit"])) {
-    if (isset($_SESSION['attempts']) && $_SESSION['attempts'] >= 5 && (time() - $_SESSION['last_attempt_time'] < 300)) {
+    if (isset($_SESSION['attempts']) && $_SESSION['attempts'] >= 5 && (time() - $_SESSION['last_attempt_time'] < 60)) {
         echo "<script>
             alert('Too many login attempts. Please wait 5 minutes.');
             window.location.href = window.location.href;

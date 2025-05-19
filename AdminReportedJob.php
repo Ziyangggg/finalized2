@@ -303,7 +303,6 @@ function confirmation()
 </script>
 
 <?php
-require_once('connect.php'); // Ensure this uses sqlsrv_connect()
 
 if (isset($_GET['dlt'])) {
     $jid = $_GET['jid'];
