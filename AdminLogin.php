@@ -1,3 +1,19 @@
+<?php
+session_start();
+if (!isset($_SESSION['attempts'])) {
+    $_SESSION['attempts'] = 0;
+    $_SESSION['last_attempt_time'] = time();
+}
+
+if (time() - $_SESSION['last_attempt_time'] < 300 && $_SESSION['attempts'] >= 5) {
+    die("Too many login attempts. Please wait 5 minutes.");
+}
+
+// On failed login:
+$_SESSION['attempts']++;
+$_SESSION['last_attempt_time'] = time();
+?>
+
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
@@ -46,38 +62,45 @@
 </html>
 
 <?php
-// Show PHP errors for debugging
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-session_start();
 include("connect.php"); // Must use sqlsrv_connect for SQL Server
 
 if (isset($_POST["submit"])) {
     $username = $_POST["adminusername"];
     $password = $_POST["adminpassword"];
 
-    // Parameterized query to prevent SQL injection
-    $sql = "SELECT * FROM finalyearproject.admin_info WHERE AdminUsername = ? AND AdminPassword = ?";
-    $params = array($username, $password);
-
+    // Get the hashed password from DB based on the username
+    $sql = "SELECT * FROM finalyearproject.admin_info WHERE AdminUsername = ?";
+    $params = array($username);
     $stmt = sqlsrv_query($connect, $sql, $params);
 
     if ($stmt === false) {
-        die(print_r(sqlsrv_errors(), true)); // Show SQL error if any
+        die(print_r(sqlsrv_errors(), true));
     }
 
     if ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
-        $_SESSION["adminusername"] = $row["AdminUsername"];
-        $_SESSION["adminid"] = $row["AdminID"];
+        // Use password_verify to compare input password with stored hashed password
+        if (password_verify($password, $row["AdminPassword"])) {
+            session_regenerate_id(true);
 
-        echo "<script>
-            alert('Login successfully.');
-            window.location.href = 'AdminDashboard.php';
+            $_SESSION["adminusername"] = $row["AdminUsername"];
+            $_SESSION["adminid"] = $row["AdminID"];
+            $_SESSION["role"] = $row["Role"];
+            $_SESSION["LAST_ACTIVITY"] = time();
+
+            echo "<script>
+                alert('Login successfully.');
+                window.location.href = 'AdminDashboard.php';
+            </script>";
+        }else{
+            echo "<script>
+            alert('Login failed');
+            window.location.href = window.location.href;
         </script>";
+        }
     } else {
         echo "<script>
-            alert('Login failed. Please check your username or password.');
-            window.location.href = window.location.href; // Refresh
+            alert('Login failed');
+            window.location.href = window.location.href;
         </script>";
     }
 

@@ -243,11 +243,29 @@ sqlsrv_free_stmt($stmt);
     $phonenumber = $_POST["phonenumber"];
     $address = $_POST["address"];
 
-    $sql = "INSERT INTO finalyearproject.admin_info 
-            (AdminFullName, AdminUsername, AdminPassword, AdminEmail, AdminPhone, AdminAddress)
-            VALUES (?, ?, ?, ?, ?, ?)";
+    // Check if the username already exists
+    $checkSql = "SELECT * FROM finalyearproject.admin_info WHERE AdminUsername = ?";
+    $checkParams = array($username);
+    $checkStmt = sqlsrv_query($connect, $checkSql, $checkParams);
+    if ($checkStmt === false) {
+        die(print_r(sqlsrv_errors(), true));
+    }
+    if (sqlsrv_fetch_array($checkStmt, SQLSRV_FETCH_ASSOC)) {
+        echo "<script>alert('Username already exists! Please choose a different username.');</script>";
+        sqlsrv_free_stmt($checkStmt);
+        sqlsrv_close($connect);
+        exit();
+    }
 
-    $params = array($name, $username, $password, $emailaddress, $phonenumber, $address);
+    // Hash the password
+    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+
+    $sql = "INSERT INTO finalyearproject.admin_info 
+            (AdminFullName, AdminUsername, AdminPassword, AdminEmail, AdminPhone, AdminAddress, Role)
+            VALUES (?, ?, ?, ?, ?, ?, 'Admin')";
+
+    $params = array($name, $username, $hashedPassword, $emailaddress, $phonenumber, $address);
 
     $stmt = sqlsrv_query($connect, $sql, $params);
 
