@@ -1,3 +1,19 @@
+<?php
+session_start();
+if (!isset($_SESSION['attempts'])) {
+    $_SESSION['attempts'] = 0;
+    $_SESSION['last_attempt_time'] = time();
+}
+
+if (time() - $_SESSION['last_attempt_time'] < 300 && $_SESSION['attempts'] >= 5) {
+    die("Too many login attempts. Please wait 5 minutes.");
+}
+
+// On failed login:
+$_SESSION['attempts']++;
+$_SESSION['last_attempt_time'] = time();
+?>
+
 <!DOCTYPE html>
 
 <html lang="en" dir="ltr">
@@ -61,64 +77,59 @@
 </html>
 
 <?php
-  session_start();
 	include("connect.php");
-	
+
 	if(isset($_POST["submit"]))
 	{
-	$username = $_POST["username"];
-	$password = $_POST["password"];
-	
-	//$username = stripcslashes($username);
-	//$password = stripcslashes($password);
-	//$username = mysqli_real_escape_string($connect,$username);
-	//$password = mysqli_real_escape_string($connect,$password);
-	
-	$query = "SELECT * FROM finalyearproject.job_seekerinfo WHERE Job_SeekerUsername = ? AND Job_SeekerPassword = ? AND is_deleted = 0";
-  $params = array($username, $password);
+		$username = $_POST["username"];
+		$password = $_POST["password"];
+		
+		// Modify query: don't check password here — just fetch user by username
+		$query = "SELECT * FROM finalyearproject.job_seekerinfo WHERE Job_SeekerUsername = ? AND is_deleted = 0";
+		$params = array($username);
+		$result = sqlsrv_query($connect, $query, $params);
 
-  $result = sqlsrv_query($connect, $query, $params);
+		if ($result === false) {
+			die(print_r(sqlsrv_errors(), true));
+		}
 
-  // Check if query failed
-  if ($result === false) {
-      die(print_r(sqlsrv_errors(), true));  // Show the SQL Server error
-  }
+		$row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC);
 
-$row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC);
-	//$count = mysqli_num_rows($result);
-	
-	if(is_array($row))
-  {
-    $_SESSION["username"] = $row["Job_SeekerUsername"];
-		$_SESSION["password"] = $row["Job_SeekerPassword"];
-    $_SESSION["jobseekerid"] = $row["Job_SeekerID"];
-    $jobseekerid= $row["Job_SeekerID"];
-    
-    $sql66 = "SELECT * FROM resume_jobseeker WHERE Job_SeekerID = '$jobseekerid'";
-		$result666 = sqlsrv_query($connect, $sql66);
-		$row6 = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC);
-		if(!is_array($row6)){ 
-      echo"<script>
-      alert('Pls create your resume in order to apply jobs :)');
-      window.location.replace('JobSeekerResume.php');
-      </script>";
-    }else{
-      echo"<script>
-		alert('Login successfully.');
-		window.location.replace('JobSeekerJobListing.php');
-    </script>";
-    }
+		// Only added this part for hashing:
+		if (is_array($row) && password_verify($password, $row["Job_SeekerPassword"])) {
+			$_SESSION["username"] = $row["Job_SeekerUsername"];
+			$_SESSION["password"] = $row["Job_SeekerPassword"];
+			$_SESSION["jobseekerid"] = $row["Job_SeekerID"];
+			$_SESSION["role"] = $row["Role"];
+			$jobseekerid = $row["Job_SeekerID"];
+			
+			$sql66 = "SELECT * FROM finalyearproject.resume_jobseeker WHERE Job_SeekerID = '$jobseekerid'";
+			$result666 = sqlsrv_query($connect, $sql66);
+			$row6 = sqlsrv_fetch_array($result666, SQLSRV_FETCH_ASSOC);
 
+			if (!is_array($row6)) {
+				echo "<script>
+					alert('Pls create your resume in order to apply jobs :)');
+					window.location.replace('JobSeekerResume.php');
+				</script>";
+			} else {
+				echo "<script>
+					alert('Login successfully.');
+					window.location.replace('JobSeekerJobListing.php');
+				</script>";
+			}
+		}
+		else
+		{
+			echo "<script>
+				alert('Login unsuccessfully.');
+			</script>";
+		}
 	}
-  else
-  {
-    echo"<script>
-    alert('Login unsuccessfully.');
-    </script>";
-	}
-}
-sqlsrv_close($connect);
+
+	sqlsrv_close($connect);
 ?>
+
 
 
 

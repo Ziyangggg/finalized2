@@ -8,7 +8,6 @@
   </head>
   <?php
 include("Jobseeker_session.php");
-require_once('connect.php');
 $query=sqlsrv_query($connect,"SELECT * FROM finalyearproject.job_seekerinfo where Job_SeekerID='$jobseekerid' ")or die(sqlsrv_errors());
 $row=sqlsrv_fetch_array($query);
 
@@ -201,7 +200,6 @@ $row=sqlsrv_fetch_array($query);
 </html>
 
 <?php
-	include("connect.php");
 	
   $query=sqlsrv_query($connect,"SELECT * FROM finalyearproject.job_seekerinfo where Job_SeekerID='$jobseekerid'")or die(sqlsrv_errors());
   $row=sqlsrv_fetch_array($query);
@@ -221,7 +219,7 @@ $row=sqlsrv_fetch_array($query);
     // Hash the password securely before storing
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 		
-		$query = "UPDATE finalyearproject.job_seekerinfoSET Job_SeekerFullname = ?, Job_SeekerUsername = ?, Job_SeekerPassword = ?, Job_SeekerEmail = ?, Job_SeekerPhone = ?, Job_SeekerAddress = ? WHERE Job_SeekerID = ?";
+		$query = "UPDATE finalyearproject.job_seekerinfo SET Job_SeekerFullname = ?, Job_SeekerUsername = ?, Job_SeekerPassword = ?, Job_SeekerEmail = ?, Job_SeekerPhone = ?, Job_SeekerAddress = ? WHERE Job_SeekerID = ?";
 		$params = [$name, $username, $password, $email, $phonenumber, $address, $jobseekerid];
     $result = sqlsrv_query($connect,$query, $params) or die(sqlsrv_errors($connect));
 		

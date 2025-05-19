@@ -68,25 +68,42 @@
 </html>
 
 <?php
-	include("connect.php");
-	
-	if(isset($_POST["submit"]))
-	{
-		$name = $_POST["fullname"];
-		$username = $_POST["username"];
-		$password = $_POST["password"];
-		$email = $_POST["email"];
-    $phonenumber = $_POST["phone"];
-    $address = $_POST["address"];
-		
-		$query = "INSERT INTO finalyearproject.job_seekerinfo(Job_SeekerFullname,Job_SeekerUsername,Job_SeekerPassword,Job_SeekerEmail,Job_SeekerPhone,Job_SeekerAddress,is_deleted)
-		VALUES('$name','$username','$password','$email','$phonenumber','$address','0')";
-		$result = sqlsrv_query($connect,$query);
-		
+include("connect.php");
 
-	sqlsrv_close($connect);
-	
-	?>
+if (isset($_POST["submit"])) {
+    // Set timezone
+    date_default_timezone_set("Asia/Kuala_Lumpur");
+
+    // Trim and sanitize input
+    $name = trim($_POST["fullname"]);
+    $username = trim($_POST["username"]);
+    $password = trim($_POST["password"]);
+    $email = filter_var(trim($_POST["email"]), FILTER_VALIDATE_EMAIL);
+    $phonenumber = preg_replace('/\D/', '', $_POST["phone"]);
+    $address = trim($_POST["address"]);
+
+    // Validate inputs
+    if (empty($name) || empty($username) || empty($password) || !$email || empty($phonenumber) || empty($address)) {
+        exit("Invalid input. Please fill in all fields correctly.");
+    }
+
+    // Hash the password securely
+    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+    // Use prepared statements to prevent SQL injection
+    $query = "INSERT INTO finalyearproject.job_seekerinfo 
+        (Job_SeekerFullname, Job_SeekerUsername, Job_SeekerPassword, Job_SeekerEmail, Job_SeekerPhone, Job_SeekerAddress, is_deleted)
+        VALUES (?, ?, ?, ?, ?, ?, '0')";
+    $params = [$name, $username, $hashedPassword, $email, $phonenumber, $address];
+    $result = sqlsrv_query($connect, $query, $params);
+
+    if ($result === false) {
+        error_log(print_r(sqlsrv_errors(), true));
+        exit("Database error.");
+    }
+
+    sqlsrv_close($connect);
+    ?>
 	
 	<script>
 		alert("Sign Up Done!");

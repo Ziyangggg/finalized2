@@ -63,13 +63,11 @@
     $aftemail=base64_decode($b4email);
 	  $newpassword = $_POST["password"];
 	
-	//$username = stripcslashes($username);
-	//$password = stripcslashes($password);
-	//$username = mysqli_real_escape_string($connect,$username);
-	//$password = mysqli_real_escape_string($connect,$password);
+	  $hashed_password = password_hash($newpassword, PASSWORD_DEFAULT);
 	
-	$query = "UPDATE finalyearproject.job_seekerinfo SET Job_SeekerPassword = '$newpassword' WHERE Job_SeekerEmail='$aftemail'";
-	$result = sqlsrv_query($connect,$query);
+	$sql = "UPDATE finalyearproject.job_seekerinfo SET Job_SeekerPassword = ? WHERE Job_SeekerEmail = ?";
+	$params = array($hashed_password, $aftemail);
+  $stmt = sqlsrv_query($connect, $sql, $params);
 ?>
 <script>
 		alert("New Password Is Set");

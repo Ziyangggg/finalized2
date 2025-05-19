@@ -4,7 +4,6 @@
     <title>Company Profile</title>
     <meta charset="UTF-8">
     <?php
-    require_once('connect.php');
     include('company_session.php');
 
     $sql = "SELECT * FROM finalyearproject.Company_Info WHERE CompanyID = ? AND is_deleted = '0'";

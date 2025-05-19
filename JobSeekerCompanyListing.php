@@ -1,6 +1,5 @@
 <?php
 include("Jobseeker_session.php");
-require_once('connect.php');
 $query=sqlsrv_query($connect,"SELECT * FROM finalyearproject.job_seekerinfo where Job_SeekerID='$jobseekerid' ")or die(sqlsrv_errors());
 $row38=sqlsrv_fetch_array($query);
 
@@ -102,7 +101,6 @@ $row38=sqlsrv_fetch_array($query);
       </form>
       
 			<?php
-            require_once('connect.php');
 
             $search = '';
             if (isset($_GET['search'])) {

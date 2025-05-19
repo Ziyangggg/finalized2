@@ -1,5 +1,4 @@
 <?php
-require_once('connect.php');
 include('company_session.php');
 $sql = "SELECT * FROM finalyearproject.Company_Info WHERE CompanyID = ? AND is_deleted = '0'";
 $params = array($companyid);

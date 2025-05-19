@@ -76,7 +76,7 @@
 
 <?php
 }
-mysqli_close($connect);
+sqlsrv_close($connect);
 ?>
 
 

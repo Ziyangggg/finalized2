@@ -1,6 +1,5 @@
 <?php
 include("Jobseeker_session.php");
-require_once('connect.php');
 $query=sqlsrv_query($connect,"SELECT * FROM finalyearproject.job_seekerinfo where Job_SeekerID='$jobseekerid' ")or die(sqlsrv_errors());
 $row38=sqlsrv_fetch_array($query);
 
@@ -130,46 +129,6 @@ $row38=sqlsrv_fetch_array($query);
               
               Thank you for choosing Job Seeker for your job search needs. We look forward to helping you find your dream job!</div>
           </div>
-
-      <div>
-        <br><h2 style="text-align:center">Our Team</h2><br>
-      </div>
-      
-      <div class="row">
-
-        <div class="column">
-          <div class="card">
-            <img src="TT.jpg" alt="TT" style="width:100%">
-            <div class="container">
-              <h3>Terry Teoh</h3>
-              <p class="occupation">Developer</p>
-              <p>1211203191@student.mmu.edu.my</p>
-            </div>
-          </div>
-        </div>
-      
-        <div class="column">
-          <div class="card">
-            <img src="JF.jpg" alt="JF" style="width:100%">
-            <div class="container">
-              <h3>Kui Jun Foo</h3>
-              <p class="occupation">Developer</p>
-              <p>1211201760@student.mmu.edu.my</p>
-            </div>
-          </div>
-        </div>
-      
-        <div class="column">
-          <div class="card">
-            <img src="ZY.jpg" alt="ZY" style="width:100%">
-            <div class="container">
-              <h3>Lee Zhan Yu</h3>
-              <p class="occupation">Developer</p>
-              <p>1211200096@student.mmu.edu.my</p>
-            </div>
-          </div>
-        </div>
-      </div>
 
     </div>
   </div>

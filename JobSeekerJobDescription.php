@@ -1,6 +1,5 @@
 <?php
 include ("Jobseeker_session.php");
-require_once('connect.php');
 $query=sqlsrv_query($connect,"SELECT * FROM finalyearproject.job_seekerinfo where Job_SeekerID='$jobseekerid' ")or die(sqlsrv_errors());
 $row38=sqlsrv_fetch_array($query);
 ?>
@@ -175,7 +174,6 @@ $row38=sqlsrv_fetch_array($query);
 							
             		<div class="similarboxes">
 						<?php
-							require_once('connect.php');
 							$query = "select * from finalyearproject.JobListing WHERE JobCategoryID='$new2' AND is_deleted = '0' ORDER BY JobListingID DESC LIMIT 8 ";
 							$result = sqlsrv_query($connect,$query);
 							while($row = sqlsrv_fetch_array($result, SQLSRV_FETCH_ASSOC) ){

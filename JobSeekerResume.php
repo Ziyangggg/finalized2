@@ -1,11 +1,21 @@
 <?php
 include("Jobseeker_session.php");
-require_once('connect.php');
-$query=sqlsrv_query($connect,"SELECT * FROM finalyearproject.resume_jobseeker where Job_SeekerID='$jobseekerid' ")or die(sqlsrv_errors());
-$row=sqlsrv_fetch_array($query);
 
-$query=sqlsrv_query($connect,"SELECT * FROM finalyearproject.job_seekerinfo where Job_SeekerID='$jobseekerid' ")or die(sqlsrv_errors());
-$row38=sqlsrv_fetch_array($query);
+// $query=sqlsrv_query($connect,"SELECT * FROM finalyearproject.resume_jobseeker where Job_SeekerID='$jobseekerid' ")or die(sqlsrv_errors());
+// $row=sqlsrv_fetch_array($query);
+
+// $query=sqlsrv_query($connect,"SELECT * FROM finalyearproject.job_seekerinfo where Job_SeekerID='$jobseekerid' ")or die(sqlsrv_errors());
+// $row38=sqlsrv_fetch_array($query);
+
+	$query = "SELECT * FROM finalyearproject.resume_jobseeker WHERE Job_SeekerID = ?";
+	$params = [$jobseekerid];
+	$stmt = sqlsrv_query($connect, $query, $params);
+	$row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+
+	$query = "SELECT * FROM finalyearproject.job_seekerinfo WHERE Job_SeekerID = ?";
+	$params = [$jobseekerid];
+	$stmt = sqlsrv_query($connect, $query, $params);
+	$row38 = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
@@ -103,7 +113,7 @@ $row38=sqlsrv_fetch_array($query);
 			
 		
 			<div class="profile-details">
-			  <span class="admin_name"><?php echo $row38['Job_SeekerUsername'] ?></span>
+			  <span class="admin_name"><?php echo $row38['Job_SeekerFullname'] ?></span>
 			  
 			</div>
 		  </nav>
@@ -270,7 +280,6 @@ $row38=sqlsrv_fetch_array($query);
 </html>
 
 <?php
-	include("connect.php");
 	
 	if(isset($_POST["submit"]))
 	{ 	
