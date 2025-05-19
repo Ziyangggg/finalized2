@@ -320,8 +320,8 @@
         $sql = "INSERT INTO finalyearproject.company_info 
             (CompanyUsername, CompanyPassword, CompanyName, CompanyEmail, CompanySize, CompanyIndustry, 
              CompanyRegistrationNo, CompanyDescription, CompanyWebsite, CompanyAddress, CompanyPhone, 
-             CompanyOurTeam, CompanyOurMission, CompanyOurVision, CompanyLogo, is_deleted)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '0')";
+             CompanyOurTeam, CompanyOurMission, CompanyOurVision, CompanyLogo, is_deleted, role)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '0', 'company')";
 
         $params = array(
                 array($username, SQLSRV_PARAM_IN),
@@ -345,8 +345,8 @@
         $sql = "INSERT INTO finalyearproject.company_info 
             (CompanyUsername, CompanyPassword, CompanyName, CompanyEmail, CompanySize, CompanyIndustry, 
              CompanyRegistrationNo, CompanyDescription, CompanyWebsite, CompanyAddress, CompanyPhone, 
-             CompanyOurTeam, CompanyOurMission, CompanyOurVision, is_deleted)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '0')";
+             CompanyOurTeam, CompanyOurMission, CompanyOurVision, is_deleted, role)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '0', 'company')";
 
         $params = array($username, $hashed_password, $name, $email, $size, $industry, $registrationnumber,
                         $description, $website, $address, $phone, $team, $mission, $vision);

@@ -1,3 +1,19 @@
+<?php
+session_start();
+if (!isset($_SESSION['attempts'])) {
+    $_SESSION['attempts'] = 0;
+    $_SESSION['last_attempt_time'] = time();
+}
+
+if (time() - $_SESSION['last_attempt_time'] < 300 && $_SESSION['attempts'] >= 5) {
+    die("Too many login attempts. Please wait 5 minutes.");
+}
+
+// On failed login:
+$_SESSION['attempts']++;
+$_SESSION['last_attempt_time'] = time();
+?>
+
 <!DOCTYPE html>
 
 <html lang="en" dir="ltr">
@@ -56,40 +72,54 @@
 </html>
 
 <?php
-session_start();
 include("connect.php");
 
 if (isset($_POST["submit"])) {
     $username = $_POST["username"];
     $password = $_POST["password"];
 
-    $query = "SELECT * FROM finalyearproject.company_info WHERE CompanyUsername = ? AND CompanyPassword = ? AND is_deleted = '0'";
-    $params = array($username, $password);
-
-    $stmt = sqlsrv_query($connect, $query, $params);
+    $sql = "SELECT * FROM finalyearproject.company_info WHERE CompanyUsername = ? AND is_deleted = '0'";
+    $params = array($username);
+    $stmt = sqlsrv_query($connect, $sql, $params);
 
     if ($stmt === false) {
         die(print_r(sqlsrv_errors(), true));
     }
 
-    $row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+    if ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+        // Use password_verify to compare input password with stored hashed password
+        if (password_verify($password, $row["CompanyPassword"])) {
 
-    if (is_array($row)) {
-        $_SESSION["username"] = $row["CompanyUsername"];
-        $_SESSION["password"] = $row["CompanyPassword"];
-        $_SESSION["companyid"] = $row["CompanyID"];
+            unset($_SESSION['attempts']);
+            unset($_SESSION['last_attempt_time']);
+            session_regenerate_id(true);
 
-        echo "<script>
-            alert('Login successfully.');
-            window.location.replace('CompanyDashboard.php');
-        </script>";
-    } else {
-        echo "<script>
-            alert('Login unsuccessfully.');
-        </script>";
-    }
+            $_SESSION["username"] = $row["CompanyUsername"];
+            $_SESSION["companyid"] = $row["CompanyID"];
+            $_SESSION["role"] = $row["role"];
+            $_SESSION["LAST_ACTIVITY"] = time();
+
+            echo "<script>
+                alert('Login successfully.');
+                window.location.replace('CompanyDashboard.php');
+            </script>";
+        } else {
+          // only record when login failed
+          if (!isset($_SESSION['attempts'])) {
+                $_SESSION['attempts'] = 0;
+            }
+
+            $_SESSION['attempts']++;
+            $_SESSION['last_attempt_time'] = time();
+
+            echo "<script>
+                alert('Login failed.');
+                window.location.href = window.location.href;
+            </script>";
+        }
 
     sqlsrv_free_stmt($stmt);
     sqlsrv_close($connect);
+      }
 }
 ?>
